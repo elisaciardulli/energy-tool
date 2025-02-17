@@ -10,8 +10,8 @@
             hide-view-selector
             :time="false"
             :transitions="false"
-            active-view="week"
-            :disable-views="['week']"
+            active-view="month"
+            :disable-views="['years']"
             today-button
             style="width: 100%; height: auto;">
           </vue-cal>
@@ -22,13 +22,26 @@
       <v-col cols="12" md="9">
         <div class="big-cal-container">
           <vue-cal 
-            class="vuecal--blue-theme" style="height: 80%" 
+            class="vuecal--blue-theme" 
             :disable-views="['years']"
             :time-from="6 * 60"
             :time-to="21 * 60"
             :time-step="30"
+            active-view="week"
             today-button
-            :special-hours="specialHours">
+            :events="events"
+            style="height: 90vh"
+            >
+            <!-- Custom Today Button -->
+            <template #today-button>
+              <v-tooltip>
+                <template #activator="{ on }">
+                  <v-btn v-on="on">
+                    <span>Today</span>
+                  </v-btn>
+                </template>
+              </v-tooltip>
+            </template>
           </vue-cal>
         </div>
       </v-col>
@@ -40,65 +53,18 @@
 export default {
   data() {
     return {
-      specialHours: {
-        // Monday (1)
-        1: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
-        },
-        
-        // Tuesday (2)
-        2: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
-        },
-
-        // Wednesday (3) - Multiple shifts
-        3: [
-          {
-            from: 9 * 60,
-            to: 17 * 60,
-            class: 'heating',
-            label: 'Heating'
-          }
-        ],
-
-        // Thursday (4)
-        4: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
-        },
-
-        // Friday (5)
-        5: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
-        },
-
-        // Saturday (6)
-        6: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
-        },
-
-        // Sunday (7)
-        7: {
-          from: 9 * 60,
-          to: 17 * 60,
-          class: 'heating',
-          label: 'Heating'
+      events: [
+        {
+          start: '2025-02-17 09:00',
+          end: '2025-02-17 17:00',
+          // You can also define event dates with Javascript Date objects:
+          // start: new Date(2018, 11 - 1, 16, 10, 30),
+          // end: new Date(2018, 11 - 1, 16, 11, 30),
+          title: 'Heating',
+          content: '<i class="icon material-icons">device_thermostat</i>',
+          class: 'heating'
         }
-      }
+      ]
     }
   }
 }
@@ -110,10 +76,17 @@ v-container {
 }
 
 /* Style events */
-.vuecal__special-hours {
-  display: flex;
-  padding-block: 0.7rem;
-  padding-inline-start: 0.5rem;
+.vuecal__event-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-top: 0.5rem;
+}
+
+.vuecal__event-time {
+  display: none;
+}
+
+.vuecal__event-content {
 }
 
 /* Style heating events */
