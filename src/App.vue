@@ -7,11 +7,11 @@
           <vue-cal
             class="vuecal--date-picker vuecal--blue-theme"
             xsmall
-            hide-view-selector
             :time="false"
-            :transitions="false"
+            hide-view-selector
             active-view="month"
-            :disable-views="['years']"
+            :disable-views="['years', 'year', 'week', 'day']"
+            @cell-focus="selectedDate = $event"
             today-button
             style="width: 100%; height: auto;">
           </vue-cal>
@@ -23,15 +23,19 @@
         <div class="big-cal-container">
           <vue-cal 
             class="vuecal--blue-theme" 
-            :disable-views="['years']"
-            :time-from="6 * 60"
-            :time-to="21 * 60"
+            :disable-views="['years', 'year', 'week', 'month']"
             :time-step="30"
-            active-view="week"
+            active-view="day"
             today-button
-            :events="events"
+            hide-view-selector
+            :selected-date="selectedDate"
+            :split-days="daySplits"
+            sticky-split-labels
             style="height: 90vh"
             >
+            <template #split-label="{ split }">
+              <strong>{{ split.label }}</strong>
+            </template>
             <!-- Custom Today Button -->
             <template #today-button>
               <v-tooltip>
@@ -53,22 +57,61 @@
 export default {
   data() {
     return {
-      events: [
-        {
-          start: '2025-02-17 09:00',
-          end: '2025-02-17 17:00',
-          // You can also define event dates with Javascript Date objects:
-          // start: new Date(2018, 11 - 1, 16, 10, 30),
-          // end: new Date(2018, 11 - 1, 16, 11, 30),
-          title: 'Heating',
-          content: '<i class="icon material-icons">device_thermostat</i>',
-          class: 'heating'
+      selectedDate: new Date().toISOString().split('T')[0],
+      daySplits: [
+        { label: 'Seminar 1', class: 'seminar1' },
+        { label: 'Seminar 2', class: 'seminar2' },
+        { label: 'Seminar 3', class: 'seminar3' },
+        { label: 'Seminar 4', class: 'seminar4' },
+        { label: 'Seminar Area', class: 'seminarArea' },
+        { label: 'Foyer', class: 'foyer' },
+        { label: 'Crane Hall', class: 'cranehall' }
+      ],
+      events: []
+    };
+  },
+  async mounted() {
+    // Fetch data when the component is mounted
+    const startDate = ;
+    const endDate = '2025-02-28';
+    const fetchedEvents = await this.getData(startDate, endDate);
+    if (fetchedEvents && fetchedEvents.Items) {
+      this.events = fetchedEvents.Items; // Update the events array with fetched data
+    }
+  },
+  methods: {
+    async getData(startDate, endDate) {
+      const baseUrl = "https://tourism.api.opendatahub.com/v1/EventShort";
+
+      const params = new URLSearchParams({
+        /* pagenumber: "1", */
+        startdate: startDate,
+        enddate: endDate,
+        eventlocation: "NOI",
+        active: "true",
+        sortorder: "ASC",
+        optimizedates: "true",
+        removenullvalues: "true",
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
         }
-      ]
+
+        const json = await response.json();
+        return json; // Return the data
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   }
-}
+};
 </script>
+
 
 <style>
 v-container {
@@ -100,5 +143,16 @@ v-container {
 
 .vuecal__now-line {
   color: black;
+}
+
+/*Style split columns*/
+.vuecal .day-split-header {
+  font-size: 0.8rem;
+}
+.vuecal__body {
+}
+
+.vuecal__no-event {
+  display: none;
 }
 </style>
