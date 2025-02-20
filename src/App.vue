@@ -28,9 +28,11 @@
             active-view="day"
             today-button
             hide-view-selector
-            :selected-date="selectedDate"
             :split-days="daySplits"
             sticky-split-labels
+            :selected-date="selectedDate"
+            :events="events"
+            @view-change="onViewChange"
             style="height: 90vh"
             >
             <template #split-label="{ split }">
@@ -57,36 +59,79 @@
 export default {
   data() {
     return {
-      selectedDate: new Date().toISOString().split('T')[0],
+      currDate: new Date(),
+      selectedDate: new Date(),
       daySplits: [
-        { label: 'Seminar 1', class: 'seminar1' },
-        { label: 'Seminar 2', class: 'seminar2' },
-        { label: 'Seminar 3', class: 'seminar3' },
-        { label: 'Seminar 4', class: 'seminar4' },
-        { label: 'Seminar Area', class: 'seminarArea' },
-        { label: 'Foyer', class: 'foyer' },
-        { label: 'Crane Hall', class: 'cranehall' }
+        {label: 'Seminar 1', class: 'seminar1' },
+        {label: 'Seminar 2', class: 'seminar2' },
+        {label: 'Seminar 3', class: 'seminar3' },
+        {label: 'Seminar 4', class: 'seminar4' },
+        {label: 'Seminar Area', class: 'seminarArea' },
+        {label: 'Foyer', class: 'foyer' },
+        {label: 'Crane Hall', class: 'cranehall' }
       ],
       events: []
     };
   },
   async mounted() {
     // Fetch data when the component is mounted
-    const startDate = ;
-    const endDate = '2025-02-28';
+    const startDate = new Date(this.selectedDate);
+    startDate.setUTCHours(0,0,0,0);
+    const endDate = new Date(this.selectedDate);
+    endDate.setUTCHours(23, 59, 59, 999);
+
     const fetchedEvents = await this.getData(startDate, endDate);
     if (fetchedEvents && fetchedEvents.Items) {
-      this.events = fetchedEvents.Items; // Update the events array with fetched data
+      console.log("fetched events: ", fetchedEvents + " fetchedEventsItem: ", fetchedEvents.Items);
+      const eventsForCalendar = fetchedEvents.Items.map(event => {
+
+        return {
+          start: this.getDateFormatted(event.RoomBooked[0].StartDate),
+          end: this.getDateFormatted(event.RoomBooked[0].EndDate),
+          title: event.EventTitle.it,
+          content: "",
+          class: "event",
+          split: event.RoomBooked[0].Space,
+        };
+      });
+      this.events = eventsForCalendar;
+      console.log("events: ", this.events);
     }
   },
   methods: {
+    getDateFormatted(dateString) {
+      const date = new Date(dateString);
+      
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(date.getUTCDate()).padStart(2, "0");
+      const hours = String(date.getUTCHours()).padStart(2, "0");
+      const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    },
+
+    async onViewChange(newDate) {
+      this.selectedDate = newDate.startDate;
+      
+      const startDate = new Date(this.selectedDateDate);
+      startDate.setHours(0,0,0,0);
+      const endDate = new Date(this.selectedDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      // fecth data on view change
+      const fetchedEvents = await this.getData(startDate.toISOString(), endDate.toISOString());
+      if (fetchedEvents && fetchedEvents.Items) {
+        this.events = fetchedEvents.Items; // Update the events array with fetched data
+      }
+    },
     async getData(startDate, endDate) {
       const baseUrl = "https://tourism.api.opendatahub.com/v1/EventShort";
 
       const params = new URLSearchParams({
-        /* pagenumber: "1", */
-        startdate: startDate,
-        enddate: endDate,
+        pagenumber: "1",
+        startdate: startDate.toISOString().split('T')[0],
+        enddate: endDate.toISOString().split('T')[0],
         eventlocation: "NOI",
         active: "true",
         sortorder: "ASC",
@@ -103,6 +148,7 @@ export default {
         }
 
         const json = await response.json();
+        console.log('Fetched JSON:', json);
         return json; // Return the data
       } catch (error) {
         console.error(error.message);
@@ -133,7 +179,7 @@ v-container {
 }
 
 /* Style heating events */
-.heating {
+.event {
   background-color: rgb(225, 170, 170);
   color: rgb(57, 57, 57);
   border-left: 4px solid rgb(228, 102, 102);
