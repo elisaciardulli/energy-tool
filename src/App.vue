@@ -33,6 +33,8 @@
             :selected-date="selectedDate"
             :events="events"
             @view-change="onViewChange"
+            watchRealTime
+            @cell-click="handleCellClick"
             :on-event-click="onEventClick"
             style="height: 90vh"
             >
@@ -50,14 +52,44 @@
               </v-tooltip>
             </template>
           </vue-cal>
+          <!--Dialog window-->
           <v-dialog v-model="showDialog">
-            <!--Dialog window-->
             <v-card>
               <v-card-title>
-                <span>{{ selectedEvent.title }}</span>
+                <span>{{ selectedSplit }}</span>
+                <!--Close Button-->
+                <span class="close-btn" icon @click="showDialog = false">
+                  <v-icon>mdi-close</v-icon>
+                </span>
               </v-card-title>
               <v-card-text>
-                <p>This is where the table will go</p>
+                <table>
+                  <tr>
+                    <td></td>
+                    <td class="t-header">Timestamp</td>
+                    <td class="t-header">Value</td>
+                  </tr>
+                  <tr>
+                    <td class="t-header">Temperature (°C)</td>
+                    <td>get data</td>
+                    <td>get data</td>
+                  </tr>
+                  <tr>
+                    <td class="t-header">Humidity (%)</td>
+                    <td>get data</td>
+                    <td>get data</td>
+                  </tr>
+                  <tr>
+                    <td class="t-header">Carbon dioxide (ppm)</td>
+                    <td>get data</td>
+                    <td>get data</td>
+                  </tr>
+                  <tr>
+                    <td class="t-header">Battery status (%)	</td>
+                    <td>get data</td>
+                    <td>get data</td>
+                  </tr>
+                </table>
               </v-card-text>
             </v-card>
           </v-dialog>
@@ -71,18 +103,20 @@
 export default {
   data() {
     return {
+      showDialog: false,
+      selectedSplit: {},
       selectedEvent: {},
       showDialog: false,
       currDate: new Date(),
       selectedDate: new Date(),
       daySplits: [
-        {id:"Seminar 1", label: 'Seminar 1', class: 'seminar1' },
-        {id:"Seminar 2", label:'Seminar 2', class: 'seminar2' },
-        {id:"Seminar 3", label: 'Seminar 3', class: 'seminar3' },
-        {id:"Seminar 4", label: 'Seminar 4', class: 'seminar4' },
-        {id:"Seminar Area", label: 'Seminar Area', class: 'seminarArea' },
-        {id:"Foyer", label: 'Foyer', class: 'foyer' },
-        {id:"Crane Hall", label: 'Crane Hall', class: 'cranehall' }
+        {id:"Seminar 1", label: 'Seminar 1'},
+        {id:"Seminar 2", label:'Seminar 2'},
+        {id:"Seminar 3", label: 'Seminar 3'},
+        {id:"Seminar 4", label: 'Seminar 4'},
+        {id:"Seminar Area", label: 'Seminar Area'},
+        {id:"Foyer", label: 'Foyer'},
+        {id:"Crane Hall", label: 'Crane Hall'}
       ],
       events: []
     };
@@ -95,16 +129,14 @@ export default {
       //Make sure the events list is empty
       this.events = [];
       // Fetch data when the component is mounted
-      console.log("selectedDate: ", this.selectedDate);
       const startDate = new Date(this.selectedDate);
       startDate.setHours(0,0,0,0);
-      console.log("startDate: ", startDate);
       const endDate = new Date(this.selectedDate);
       endDate.setHours(23, 59, 59, 999);
-      console.log("endDate: ", endDate);
 
       const fetchedEvents = await this.getData(startDate, endDate);
       if (fetchedEvents && fetchedEvents.Items) {
+        console.log("fetched items: ", fetchedEvents)
         const eventsForCalendar = fetchedEvents.Items.map(event => {
           for(const i = 0; i <= event.RoomBooked.length; i++) {
             return {
@@ -118,7 +150,7 @@ export default {
           }
         });
         this.events = eventsForCalendar;
-        console.log("events: ", this.events);
+        console.log("events: ", this.events)
       } 
     },
     mapStatus(string) {
@@ -157,14 +189,15 @@ export default {
       // Prevent navigating to narrower view (default vue-cal behavior).
       e.stopPropagation()
     },
-
-    async onViewChange() {
+    async onViewChange(date) {
+      this.selectedDate = date.startDate;
       this.loadEvents();
     },
     async getData(startDate, endDate) {
       const baseUrl = "https://tourism.api.opendatahub.com/v1/EventShort";
-      console.log("start date in getDate: ", this.getDateFormatted(startDate));
-      console.log("end date in getDate: ", this.getDateFormatted(endDate));
+
+      console.log("startDate: ", this.getDateFormatted(startDate))
+      console.log("endDate: ", this.getDateFormatted(endDate))
 
       const params = new URLSearchParams({
         pagenumber: "1",
@@ -186,20 +219,34 @@ export default {
         }
 
         const json = await response.json();
-        console.log('Fetched JSON:', json);
         return json; // Return the data
       } catch (error) {
         console.error(error.message);
       }
+    },
+    handleCellClick(event, e) {
+      this.selectedSplit = event.split
+      this.showDialog = true;
+    },
+    onEventClick(event, e) {
+      this.selectedSplit = event.split;
+      this.showDialog = true;
     }
   }
 };
 </script>
 
-
 <style>
 v-container {
   max-width:none !important;
+}
+
+.vuecal__cell:hover, .day-split-header {
+  cursor:pointer;
+}
+
+.day-split-header:hover {
+  text-decoration:underline ;
 }
 
 /* Style events */
@@ -219,6 +266,44 @@ v-container {
 
 .vuecal__no-event {
   display: none;
+}
+
+/*Style dialog window */
+.v-card-title {
+  font-weight: bold;
+  padding-bottom: 0 !important;
+  padding-top: 1rem;
+  text-align: center;
+  padding-top: 1rem;
+  font-size: 1.7rem !important;
+}
+
+.close-btn {
+  position: absolute; 
+  right: 1rem; 
+  top: 1rem;
+}
+
+.close-btn:hover {
+  cursor: pointer;
+}
+
+/*Style Table*/
+table {
+  justify-content: center;
+  width: 100%;
+  border: 1px solid rgb(63, 63, 63) !important;
+  border-collapse:collapse !important; 
+}
+
+th, td {
+  border: 1px solid rgb(63, 63, 63) !important;
+  padding: 8px !important;
+  text-align: center;
+}
+
+.t-header {
+  font-weight: bold;
 }
 
 /* Style heating events */
