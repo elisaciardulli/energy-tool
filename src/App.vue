@@ -71,23 +71,23 @@
                   </tr>
                   <tr>
                     <td class="t-header">Temperature (°C)</td>
-                    <td>get data</td>
-                    <td>get data</td>
+                    <td>getTimestamp</td>
+                    <td>{{ loadSensorData("air-temperature") }}</td>
                   </tr>
                   <tr>
                     <td class="t-header">Humidity (%)</td>
                     <td>get data</td>
-                    <td>get data</td>
+                    <td>{{ loadSensorData("air-humidity") }}</td>
                   </tr>
                   <tr>
                     <td class="t-header">Carbon dioxide (ppm)</td>
                     <td>get data</td>
-                    <td>get data</td>
+                    <td>{{ loadSensorData("co2")}}</td>
                   </tr>
                   <tr>
                     <td class="t-header">Battery status (%)	</td>
                     <td>get data</td>
-                    <td>get data</td>
+                    <td>{{ loadSensorData("battery-status") }}</td>
                   </tr>
                 </table>
               </v-card-text>
@@ -114,11 +114,11 @@ export default {
         {id:"Seminar 2", label:'Seminar 2'},
         {id:"Seminar 3", label: 'Seminar 3'},
         {id:"Seminar 4", label: 'Seminar 4'},
-        {id:"Seminar Area", label: 'Seminar Area'},
         {id:"Foyer", label: 'Foyer'},
         {id:"Crane Hall", label: 'Crane Hall'}
       ],
-      events: []
+      events: [],
+      heating: []
     };
   },
   async mounted() {
@@ -126,31 +126,51 @@ export default {
   },
   methods: {
     async loadEvents() {
-      //Make sure the events list is empty
+      // Make sure the events list is empty
       this.events = [];
-      
-      //get the  start and end of the currently selected date
+
+      // Get the start and end of the currently selected date
       const startDate = new Date(this.selectedDate);
-      startDate.setHours(0,0,0,0);
+      startDate.setHours(0, 0, 0, 0);
       const endDate = new Date(this.selectedDate);
       endDate.setHours(23, 59, 59, 999);
 
       const fetchedEvents = await this.getData(startDate, endDate);
       if (fetchedEvents && fetchedEvents.Items) {
-        console.log("fetched items: ", fetchedEvents)
-        const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
-          return event.RoomBooked.map(room => ({
-            start: this.getDateFormatted(room.StartDate),
-            end: this.getDateFormatted(room.EndDate),
-            title: event.EventTitle.it,
-            content: "",
-            class: "event",
-            split: this.mapStatus(room.SpaceDesc),
-          }));
-        });
+        console.log("fetched items: ", fetchedEvents);
 
+        const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
+          return event.RoomBooked.flatMap(room => {
+            const eventStart = new Date(room.StartDate);
+            const eventEnd = new Date(room.EndDate);
+
+            // Create the event
+            const mainEvent = {
+              start: this.getDateFormatted(eventStart),
+              end: this.getDateFormatted(eventEnd),
+              title: event.EventTitle.it,
+              content: "",
+              class: "event",
+              split: this.mapStatus(room.SpaceDesc),
+            };
+
+            // Create the cooresponding heating event
+            const heatingEventStart = new Date(eventStart);
+            heatingEventStart.setHours(heatingEventStart.getHours() - 1);
+
+            const heatingEvent = {
+              start: this.getDateFormatted(heatingEventStart),
+              end: this.getDateFormatted(eventEnd),
+              class: "heating",
+              split: this.mapStatus(room.SpaceDesc),
+            };
+
+            return [heatingEvent,mainEvent];
+
+          });
+        });
         this.events = eventsForCalendar;
-      } 
+      }
     },
     mapStatus(string) {
       const roomList = [
@@ -188,9 +208,6 @@ export default {
     async getData(startDate, endDate) {
       const baseUrl = "https://tourism.api.opendatahub.com/v1/EventShort";
 
-      console.log("startDate: ", this.getDateFormatted(startDate))
-      console.log("endDate: ", this.getDateFormatted(endDate))
-
       const params = new URLSearchParams({
         pagenumber: "1",
         startdate: this.getDateFormatted(startDate),
@@ -223,9 +240,42 @@ export default {
     onEventClick(event, e) {
       this.selectedSplit = event.split;
       this.showDialog = true;
-    }
+    },
+    async getSensorData(dataType) {
+      const baseUrl = "https://mobility.api.opendatahub.com/v2/flat%2Cnode/IndoorStation/air-temperature/latest";
+
+      const params = new URLSearchParams({
+        limit: "1",
+        offset: "0",
+        where: "sname.eq.NOI:NOI-A1-Floor1-", dataType,
+        shownull: "false",
+        distinct: "true",
+        timezone: "+1",
+      });
+
+      const url = `${baseUrl}?${params.toString()}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        return json; // Return the data
+      } catch (error) {
+        console.error(error.message);
+      }
+    },
+    async loadSensorData(dataType) {
+      const fetchedData = await this.getSensorData(dataType);
+      if (fetchedData && fetchedData.Items) {
+        console.log("fetched ", dataType + ": ", fetchedData)
+        /* this.humidity = fetched; */
+      }
+    },
   }
-};
+}
 </script>
 
 <style>
@@ -244,7 +294,6 @@ v-container {
 
 /* Style events */
 .vuecal__event-title {
-  /* position: absolute; */
   font-size: 1rem;
   font-weight: 100;
   overflow: hidden;
@@ -259,6 +308,8 @@ v-container {
   color: rgb(57, 57, 57);
   border-left: 4px solid rgb(110, 170, 215);
   border-radius: 5px;
+  width: 90% !important;
+  left: 10% !important;
 }
 .vuecal__event-time {
   display: none;
@@ -308,19 +359,24 @@ th, td {
 
 /* Style heating events */
 .heating {
-  background-color: rgb(240, 190, 190);
+  background-color:  rgb(230, 100, 100);
   color: rgb(57, 57, 57);
-  border-left: 4px solid rgb(230, 100, 100);
-  box-shadow: 0 4px 8px rgba(230, 80, 80);
   border-radius: 4px;
+  width: 10% !important;
 }
 
 .vuecal__now-line {
   color: rgb(63, 63, 63);
+  border-top: 1.5px solid rgb(63, 63, 63);
 }
 
 /*Style split columns*/
 .vuecal .day-split-header {
   font-size: 0.8rem;
+}
+
+/*Style calendar columns */
+/* vuecal__flex vuecal__cell-content */ .vuecal__cell-split {
+  border: 0.5px solid rgb(222, 222, 222) !important;
 }
 </style>
