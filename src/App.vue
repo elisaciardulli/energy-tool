@@ -24,7 +24,7 @@
           <vue-cal 
             class="vuecal--blue-theme" 
             :disable-views="['years', 'year', 'week', 'month']"
-            :time-step="30"
+            :time-step="60"
             active-view="day"
             today-button
             hide-view-selector
@@ -128,7 +128,8 @@ export default {
     async loadEvents() {
       //Make sure the events list is empty
       this.events = [];
-      // Fetch data when the component is mounted
+      
+      //get the  start and end of the currently selected date
       const startDate = new Date(this.selectedDate);
       startDate.setHours(0,0,0,0);
       const endDate = new Date(this.selectedDate);
@@ -137,20 +138,18 @@ export default {
       const fetchedEvents = await this.getData(startDate, endDate);
       if (fetchedEvents && fetchedEvents.Items) {
         console.log("fetched items: ", fetchedEvents)
-        const eventsForCalendar = fetchedEvents.Items.map(event => {
-          for(const i = 0; i <= event.RoomBooked.length; i++) {
-            return {
-            start: this.getDateFormatted(event.RoomBooked[i].StartDate),
-            end: this.getDateFormatted(event.RoomBooked[i].EndDate),
+        const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
+          return event.RoomBooked.map(room => ({
+            start: this.getDateFormatted(room.StartDate),
+            end: this.getDateFormatted(room.EndDate),
             title: event.EventTitle.it,
             content: "",
             class: "event",
-            split: this.mapStatus(event.RoomBooked[i].SpaceDesc),
-            };
-          }
+            split: this.mapStatus(room.SpaceDesc),
+          }));
         });
+
         this.events = eventsForCalendar;
-        console.log("events: ", this.events)
       } 
     },
     mapStatus(string) {
@@ -181,13 +180,6 @@ export default {
       const minutes = String(date.getMinutes()).padStart(2, "0");
 
       return `${year}-${month}-${day} ${hours}:${minutes}`;
-    },
-    onEventClick(event, e) {
-      this.selectedEvent;
-      this.showDialog = true;
-
-      // Prevent navigating to narrower view (default vue-cal behavior).
-      e.stopPropagation()
     },
     async onViewChange(date) {
       this.selectedDate = date.startDate;
@@ -237,6 +229,7 @@ export default {
 </script>
 
 <style>
+
 v-container {
   max-width:none !important;
 }
@@ -251,14 +244,21 @@ v-container {
 
 /* Style events */
 .vuecal__event-title {
+  /* position: absolute; */
   font-size: 1rem;
   font-weight: 100;
-  padding: 0.5rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
 .event {
   background-color: rgb(200, 230, 250);
+  padding: 0.5rem;
   color: rgb(57, 57, 57);
   border-left: 4px solid rgb(110, 170, 215);
+  border-radius: 5px;
 }
 .vuecal__event-time {
   display: none;
