@@ -70,24 +70,24 @@
                     <td class="t-header">Value</td>
                   </tr>
                   <tr>
-                    <td class="t-header">Temperature (°C)</td>
-                    <td>getTimestamp</td>
-                    <td>{{ loadSensorData("air-temperature") }}</td>
+                    <td class="t-header">Temperature</td>
+                    <td>{{ this.temperature.time }}</td>
+                    <td>{{ this.temperature.value }}</td>
                   </tr>
                   <tr>
-                    <td class="t-header">Humidity (%)</td>
-                    <td>get data</td>
-                    <td>{{ loadSensorData("air-humidity") }}</td>
+                    <td class="t-header">Humidity</td>
+                    <td>{{ this.humidity.time }}</td>
+                    <td>{{ this.humidity.value }}</td>
                   </tr>
                   <tr>
-                    <td class="t-header">Carbon dioxide (ppm)</td>
-                    <td>get data</td>
-                    <td>{{ loadSensorData("co2")}}</td>
+                    <td class="t-header">Carbon dioxide</td>
+                    <td>{{ this.co2.time }}</td>
+                    <td>{{ this.co2.value }}</td>
                   </tr>
                   <tr>
-                    <td class="t-header">Battery status (%)	</td>
-                    <td>get data</td>
-                    <td>{{ loadSensorData("battery-status") }}</td>
+                    <td class="t-header">Battery status</td>
+                    <td>{{ this.battery.time }}</td>
+                    <td>{{ this.battery.value }}</td>
                   </tr>
                 </table>
               </v-card-text>
@@ -118,7 +118,11 @@ export default {
         {id:"Crane Hall", label: 'Crane Hall'}
       ],
       events: [],
-      heating: []
+      heating: [],
+      temperature: {time: "", value: ""},
+      humidity: {time: "", value: ""},
+      co2: {time: "", value: ""},
+      battery: {time: "", value: ""},
     };
   },
   async mounted() {
@@ -137,7 +141,6 @@ export default {
 
       const fetchedEvents = await this.getData(startDate, endDate);
       if (fetchedEvents && fetchedEvents.Items) {
-        console.log("fetched items: ", fetchedEvents);
 
         const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
           return event.RoomBooked.flatMap(room => {
@@ -236,24 +239,33 @@ export default {
     handleCellClick(event, e) {
       this.selectedSplit = event.split
       this.showDialog = true;
+      this.loadSensorData("air-temperature");
+      this.loadSensorData("air-humidity");
+      this.loadSensorData("co2");
+      this.loadSensorData("battery-state");
     },
     onEventClick(event, e) {
       this.selectedSplit = event.split;
       this.showDialog = true;
+      this.loadSensorData("air-temperature");
+      this.loadSensorData("air-humidity");
+      this.loadSensorData("co2");
+      this.loadSensorData("battery-state");
     },
     async getSensorData(dataType) {
-      const baseUrl = "https://mobility.api.opendatahub.com/v2/flat%2Cnode/IndoorStation/air-temperature/latest";
+      const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
 
       const params = new URLSearchParams({
         limit: "1",
         offset: "0",
-        where: "sname.eq.NOI:NOI-A1-Floor1-", dataType,
+        where: "sname.eq.NOI:NOI-A1-Floor1-CO2",
         shownull: "false",
         distinct: "true",
         timezone: "+1",
       });
 
       const url = `${baseUrl}?${params.toString()}`;
+      console.log("url: ", url)
 
       try {
         const response = await fetch(url);
@@ -269,9 +281,28 @@ export default {
     },
     async loadSensorData(dataType) {
       const fetchedData = await this.getSensorData(dataType);
-      if (fetchedData && fetchedData.Items) {
-        console.log("fetched ", dataType + ": ", fetchedData)
-        /* this.humidity = fetched; */
+      if (fetchedData) {
+        console.log("fetchedData: ", fetchedData)
+        const value = fetchedData.data[0].mvalue;
+        const time = this.getDateFormatted(fetchedData.data[0]._timestamp)
+        if(dataType == "air-humidity") {
+          this.humidity.value = value + "%";
+          this.humidity.time = time;
+        }
+        else if(dataType == "air-temperature") {
+          this.temperature.value = value + "°C";
+          this.temperature.time = time
+        }
+        else if(dataType == "co2") {
+          this.co2.value = value + "ppm";
+          this.co2.time = time
+        }
+        else if(dataType == "battery-state") {
+          this.battery.value = value + "%";
+          this.battery.time = time;
+        }
+      } else {
+        console.log(`No data found for ${dataType}`);
       }
     },
   }
@@ -279,19 +310,15 @@ export default {
 </script>
 
 <style>
-
 v-container {
   max-width:none !important;
 }
-
 .vuecal__cell:hover, .day-split-header {
   cursor:pointer;
 }
-
 .day-split-header:hover {
   text-decoration:underline ;
 }
-
 /* Style events */
 .vuecal__event-title {
   font-size: 1rem;
@@ -314,11 +341,9 @@ v-container {
 .vuecal__event-time {
   display: none;
 }
-
 .vuecal__no-event {
   display: none;
 }
-
 /*Style dialog window */
 .v-card-title {
   font-weight: bold;
@@ -328,17 +353,14 @@ v-container {
   padding-top: 1rem;
   font-size: 1.7rem !important;
 }
-
 .close-btn {
   position: absolute; 
   right: 1rem; 
   top: 1rem;
 }
-
 .close-btn:hover {
   cursor: pointer;
 }
-
 /*Style Table*/
 table {
   justify-content: center;
@@ -346,7 +368,6 @@ table {
   border: 1px solid rgb(63, 63, 63) !important;
   border-collapse:collapse !important; 
 }
-
 th, td {
   border: 1px solid rgb(63, 63, 63) !important;
   padding: 8px !important;
@@ -356,7 +377,6 @@ th, td {
 .t-header {
   font-weight: bold;
 }
-
 /* Style heating events */
 .heating {
   background-color:  rgb(230, 100, 100);
@@ -364,17 +384,14 @@ th, td {
   border-radius: 4px;
   width: 10% !important;
 }
-
 .vuecal__now-line {
   color: rgb(63, 63, 63);
   border-top: 1.5px solid rgb(63, 63, 63);
 }
-
 /*Style split columns*/
 .vuecal .day-split-header {
   font-size: 0.8rem;
 }
-
 /*Style calendar columns */
 /* vuecal__flex vuecal__cell-content */ .vuecal__cell-split {
   border: 0.5px solid rgb(222, 222, 222) !important;
