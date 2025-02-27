@@ -2,10 +2,13 @@ import { createApp } from 'vue'
 
 // Vuetify
 import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css';
+import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+
+// Router
+import router from './router';
 
 // Vue-cal
 import VueCal from 'vue-cal'
@@ -25,4 +28,4 @@ const vuetify = createVuetify({
   },
 })
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App).use(vuetify).use(router).mount('#app')
