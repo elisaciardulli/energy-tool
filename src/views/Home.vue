@@ -141,6 +141,7 @@
         endDate.setHours(23, 59, 59, 999);
   
         const fetchedEvents = await this.getData(startDate, endDate);
+        console.log("fetched events in main: ", fetchedEvents.Items)
         if (fetchedEvents && fetchedEvents.Items) {
   
           const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
@@ -310,13 +311,13 @@
         const headers = document.querySelectorAll('.day-split-header');
         headers.forEach(header => {
             header.addEventListener('click', () => {
-                this.goToWeeklyEvents();
+                const room = header.innerText;
+                this.goToWeeklyEvents(room);
             });
         });
       },
-      goToWeeklyEvents() {
-        console.log("Navigating to weekly events")
-        this.$router.push('/weeklyEvents')
+      goToWeeklyEvents(room) {
+        this.$router.push({ path: '/weeklyEvents', query: { room } })
       },
     }
   }
