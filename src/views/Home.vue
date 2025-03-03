@@ -36,6 +36,7 @@
               watchRealTime
               @cell-click="handleCellClick"
               :on-event-click="onEventClick"
+              overlapsPerTimeStep
               style="height: 90vh"
               >
               <template #split-label="{ split }">
@@ -133,48 +134,39 @@
       async loadEvents() {
         // Make sure the events list is empty
         this.events = [];
-  
+
         // Get the start and end of the currently selected date
         const startDate = new Date(this.selectedDate);
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(this.selectedDate);
         endDate.setHours(23, 59, 59, 999);
-  
+
         const fetchedEvents = await this.getData(startDate, endDate);
-        console.log("fetched events in main: ", fetchedEvents.Items)
+
         if (fetchedEvents && fetchedEvents.Items) {
-  
-          const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
-            return event.RoomBooked.flatMap(room => {
+          const eventsForCalendar = fetchedEvents.Items.forEach(event => {
+            return event.RoomBooked.forEach(room => {
+
+              // get the start and end of the current event
               const eventStart = new Date(room.StartDate);
               const eventEnd = new Date(room.EndDate);
-  
-              // Create the event
-              const mainEvent = {
-                start: this.getDateFormatted(eventStart),
-                end: this.getDateFormatted(eventEnd),
-                title: event.EventTitle.it,
-                content: "",
-                class: "event",
-                split: this.mapStatus(room.SpaceDesc),
-              };
-  
-              // Create the cooresponding heating event
-              const heatingEventStart = new Date(eventStart);
-              heatingEventStart.setHours(heatingEventStart.getHours() - 1);
-  
-              const heatingEvent = {
-                start: this.getDateFormatted(heatingEventStart),
-                end: this.getDateFormatted(eventEnd),
-                class: "heating",
-                split: this.mapStatus(room.SpaceDesc),
-              };
-  
-              return [heatingEvent,mainEvent];
-  
+
+              // Check special case Seminar 1+2
+              if (room.SpaceDescRoomMapping == "Seminar 1+2") {
+                const event1 = this.createEvent(eventStart, eventEnd, event, room, "Seminar 1");
+                this.events.push(event1);
+                const event2 = this.createEvent(eventStart, eventEnd, event, room, "Seminar 2");
+                this.events.push(event2);
+              } else {
+                const roomName = this.mapStatus(room.SpaceDesc);
+                // Create the main event
+                const mainEvent = this.createEvent(eventStart, eventEnd, event, room, roomName);
+                this.events.push(mainEvent)
+              }
             });
           });
-          this.events = eventsForCalendar;
+          this.events = this.events.flat();
+          console.log("events: ", this.events);
         }
       },
       mapStatus(string) {
@@ -319,6 +311,31 @@
       goToWeeklyEvents(room) {
         this.$router.push({ path: '/weeklyEvents', query: { room } })
       },
-    }
+      createEvent(start, end, event, room, roomName) {
+        //create the main event
+        const mainEvent = {
+          start: this.getDateFormatted(start),
+          end: this.getDateFormatted(end),
+          title: event.EventTitle.it,
+          content: "",
+          class: "event",
+          split: roomName,
+        };
+
+        const heatingEventStart = new Date(start);
+        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 61);
+
+        // create the corresponding heating event
+        const heatingEvent = {
+          start: this.getDateFormatted(heatingEventStart),
+          end: this.getDateFormatted(end),
+          title:"",
+          content: "",
+          class: "heating",
+          split: roomName,
+        };
+        return [mainEvent, heatingEvent];
+      },
+    },
   }
 </script>

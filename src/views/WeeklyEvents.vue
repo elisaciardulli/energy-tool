@@ -1,5 +1,6 @@
 <template>
     <v-container fluid>
+      <!--Room name and back arrow-->
         <v-row cols="12" class="titleRow">
           <v-col cols="1" md="1">
             <div>
@@ -29,6 +30,7 @@
               watchRealTime
               @cell-click="handleCellClick"
               :on-event-click="onEventClick"
+              overlapsPerTimeStep
               style="height: 85vh"
               >
               <!-- Custom Today Button -->
@@ -90,7 +92,6 @@
   </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -116,10 +117,10 @@ const route = useRoute()
       };
     },
     async mounted() {
-      this.loadEvents();
+      this.loadRoomEvents();
     },
     methods: {
-      async loadEvents() {
+      async loadRoomEvents() {
         // Make sure the events list is empty
         this.events = [];
 
@@ -132,40 +133,38 @@ const route = useRoute()
         const fetchedEvents = await this.getData(startDate, endDate);
         if (fetchedEvents && fetchedEvents.Items) {
           console.log("fetched items: ", fetchedEvents.Items)
-          const eventsForCalendar = fetchedEvents.Items.flatMap(event => {
-            return event.RoomBooked.flatMap(room => {
-              if(room.SpaceDescRoomMapping == this.$route.query.room) {
-                console.log("entered if statement")
+          fetchedEvents.Items.forEach(event => {
+            event.RoomBooked.forEach(room => {
+              const roomName = room.SpaceDescRoomMapping;
+
+              console.log("room name: ", roomName)
+
+              //filter only the correct room
+              if(roomName == this.$route.query.room) {
 
                 const eventStart = new Date(room.StartDate);
                 const eventEnd = new Date(room.EndDate);
 
-                // Create the event
-                const mainEvent = {
-                  start: this.getDateFormatted(eventStart),
-                  end: this.getDateFormatted(eventEnd),
-                  title: event.EventTitle.it,
-                  content: "",
-                  class: "event",
+                //check special case Seminar 1+2
+                if(roomName == "Seminar 1+2") {
+                  if(this.$route.query.room == "Seminar 1") {
+                    const event1 = this.createRoomEvent(eventStart, eventEnd, event, room);
+                    this.events.push(event1);
+                  }
+                  else if (this.$route.query.room == "Seminar 2"){
+                    const event2 = this.createRoomEvent(eventStart, eventEnd, event, room);
+                    this.events.push(event2);
+                  }
+                } else {
+                  const mainEvent = this.createRoomEvent(eventStart, eventEnd, event, room, room)
+                  this.events.push(mainEvent);
                 };
-
-                // Create the corresponding heating event
-                const heatingEventStart = new Date(eventStart);
-                heatingEventStart.setHours(heatingEventStart.getHours() - 1);
-
-                const heatingEvent = {
-                  start: this.getDateFormatted(heatingEventStart),
-                  end: this.getDateFormatted(eventEnd),
-                  class: "heating",
-                };
-                return [heatingEvent,mainEvent];
-              } else {
-                return []
-              }
+              };
             });
           });
-          this.events = eventsForCalendar;
         }
+        this.events = this.events.flat();
+        console.log("events: ", this.events)
       },
       mapStatus(string) {
         const roomList = [
@@ -200,7 +199,7 @@ const route = useRoute()
         // Get the start and end of the currently selected date
         this.selectedDate = date.startDate;
         //Get the right events for this week
-        this.loadEvents();
+        this.loadRoomEvents();
       },
       async getData(startDate, endDate) {
 
@@ -301,7 +300,30 @@ const route = useRoute()
       },
       goBack() {
       this.$router.back();
-    }
+      },
+      createRoomEvent(start, end, event, room) {
+        //create the main event
+        const mainEvent = {
+          start: this.getDateFormatted(start),
+          end: this.getDateFormatted(end),
+          title: event.EventTitle.it,
+          content: "",
+          class: "event"
+        };
+
+        const heatingEventStart = new Date(start);
+        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 66);
+
+        // create the corresponding heating event
+        const heatingEvent = {
+          start: this.getDateFormatted(heatingEventStart),
+          end: this.getDateFormatted(end),
+          title:"",
+          content: "",
+          class: "heating"
+        };
+        return [mainEvent, heatingEvent];
+        },
   }
 }
 </script>
