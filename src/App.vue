@@ -25,10 +25,10 @@
     text-overflow: ellipsis;
   }
   .event {
-    background-color: rgb(200, 230, 250);
+    background-color: rgb(210, 210, 210);
     padding: 0.5rem;
     color: rgb(57, 57, 57);
-    border-left: 4px solid rgb(110, 170, 215);
+    border-left: 4px solid rgb(100, 100, 100);
     border-radius: 5px;
     width: 90% !important;
     left: 10% !important;
@@ -68,7 +68,6 @@
     padding: 8px !important;
     text-align: center;
   }
-  
   .t-header {
     font-weight: bold;
   }

@@ -18,7 +18,7 @@
         <v-col class ="calendar-col" cols="12" md="12">
           <div class="big-cal-container">
             <vue-cal 
-              class="vuecal--blue-theme" 
+              class="" 
               :disable-views="['years', 'year', 'day', 'month']"
               :time-step="60"
               active-view="week"
@@ -312,7 +312,7 @@ const route = useRoute()
         };
 
         const heatingEventStart = new Date(start);
-        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 66);
+        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 60);
 
         // create the corresponding heating event
         const heatingEvent = {

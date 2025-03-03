@@ -5,7 +5,7 @@
         <v-col cols="12" md="3">
           <div class="small-cal-container">
             <vue-cal
-              class="vuecal--date-picker vuecal--blue-theme"
+              class="vuecal--date-picker"
               xsmall
               :time="false"
               hide-view-selector
@@ -22,7 +22,7 @@
         <v-col cols="12" md="9">
           <div class="big-cal-container">
             <vue-cal 
-              class="vuecal--blue-theme" 
+              class="" 
               :disable-views="['years', 'year', 'week', 'month']"
               :time-step="60"
               active-view="day"
@@ -323,7 +323,7 @@
         };
 
         const heatingEventStart = new Date(start);
-        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 61);
+        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 60);
 
         // create the corresponding heating event
         const heatingEvent = {
