@@ -1,5 +1,5 @@
 <template>
-    <v-dialog>
+    <v-dialog :value="showDialog" @input="updateShowDialog">
         <v-card>
             <v-card-title>
                 <span>{{event.title}}</span>
@@ -51,6 +51,17 @@ export default {
     co2: Object,
     battery: Object,
     showDialog: Boolean,
+  },
+  methods: {
+    // Emit an event to update showDialog in the parent
+    updateShowDialog(value) {
+      this.$emit('update:showDialog', value);
+    },
+
+    // Close the dialog and notify the parent
+    closeDialog() {
+      this.$emit('update:showDialog', false);
+    },
   },
 };
 </script>

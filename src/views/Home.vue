@@ -61,7 +61,8 @@
               :battery="battery" 
               :temperature="temperature"
               :co2="co2"
-              :humidity="humidity" v-model="showDialog">
+              :humidity="humidity" v-model="showDialog"
+              @update:showDialog="showDialog = $event">
             </EventInfo>
           </div>
         </v-col>
