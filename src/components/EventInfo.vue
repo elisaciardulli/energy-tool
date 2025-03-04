@@ -8,6 +8,7 @@
                 </span>
             </v-card-title>
             <v-card-text>
+                <p>{{ eventStart }} - {{ eventEnd }}</p>
                 <table>
                 <tr>
                     <td></td>
@@ -52,6 +53,17 @@ export default {
     battery: Object,
     showDialog: Boolean,
   },
+  data() {
+    return {
+        eventStart: '--:--',
+        eventEnd: '--:--'
+    }
+  },
+  watch: {
+    // Watch for changes to event prop and reformat the dates when the event changes
+    'event.start': 'formatEventStart',
+    'event.end': 'formatEventEnd',
+  },
   methods: {
     // Emit an event to update showDialog in the parent
     updateShowDialog(value) {
@@ -61,6 +73,17 @@ export default {
     // Close the dialog and notify the parent
     closeDialog() {
       this.$emit('update:showDialog', false);
+    },
+    formatEventStart() {
+        this.eventStart = this.formatDate(this.event.start)
+    },
+    formatEventEnd() {
+        this.eventEnd = this.formatDate(this.event.end)
+    },
+    formatDate(date) {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     },
   },
 };

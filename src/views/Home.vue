@@ -203,6 +203,7 @@ import EventInfo from "../components/EventInfo.vue"
         }
       },
       onEventClick(event, e) {
+        console.log("event: ", event)
         this.selectedEvent = event;
         this.showDialog = true;
         this.loadSensorData("air-temperature");
