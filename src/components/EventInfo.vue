@@ -7,10 +7,26 @@
                 <v-icon>mdi-close</v-icon>
                 </span>
             </v-card-title>
+            <div class="line"></div>
             <v-card-text>
-                <p>{{ eventStart }} - {{ eventEnd }}</p>
-                <div class="line"></div>
-                <table>
+              <div class="event-info">
+                <div class="time-info">
+                  <p><strong>Start time:</strong> {{ eventStart }}</p>
+                  <p><strong>End time:</strong> {{ eventEnd }}</p>
+                </div>
+                <div class="organiser-info">
+                  <p><strong>Organiser:</strong> {{ this.event.company }}</p>
+                </div>
+                <div class="contact-info" v-if="this.event.contactName || this.event.contactPhone || this.event.contactCell || this.event.contactEmail">
+                  <p><strong>Contact:</strong></p>
+                  <p v-if="this.event.contactFirstName || this.event.contactLastName">{{ this.event.contactFirstName}} {{ this.event.contactLastName}}</p>
+                  <p v-if="this.event.contactPhone"><strong>Phone number:</strong> {{ this.event.contactPhone }}</p>
+                  <p v-if="this.event.contactCell"><strong>Cell number:</strong> {{ this.event.contactCell }}</p>
+                  <p v-if="this.event.contactEmail"><strong>E-Mail:</strong> {{ this.event.contactEmail }}</p>
+                </div>
+              </div>
+              <div class="line"></div>
+              <table>
                 <tr>
                     <td></td>
                     <td class="t-header">Timestamp</td>
@@ -36,7 +52,7 @@
                     <td>{{ battery.time }}</td>
                     <td>{{ battery.value }}</td>
                 </tr>
-                </table>
+              </table>
             </v-card-text>
         </v-card>
     </v-dialog>

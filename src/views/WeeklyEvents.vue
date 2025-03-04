@@ -139,24 +139,6 @@ import EventInfo from "../components/EventInfo.vue"
         this.events = this.events.flat();
         console.log("events: ", this.events)
       },
-      mapStatus(string) {
-        const roomList = [
-          "Seminar 1",
-          "Seminar 2",
-          "Seminar 3",
-          "Seminar 4",
-          "Seminar Area",
-          "Foyer",
-          "Crane Hall",
-        ];
-        for (let i = 0; i < roomList.length; i++) {
-          let roomRegex = new RegExp(".*" + roomList[i] + ".*", "i");
-          if (roomRegex.test(string)) {
-            return roomList[i];
-          }
-        }
-        return "NO MATCH";
-      },
       getDateFormatted(dateString) {
         const date = new Date(dateString);
         

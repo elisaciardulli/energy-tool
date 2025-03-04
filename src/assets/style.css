@@ -18,6 +18,9 @@ body {
     background-color: black;
     color: white;
 }
+.vuecal__header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
 /* Events */
 .vuecal__event-title {
     font-size: 1rem;
@@ -47,10 +50,8 @@ body {
 /*Dialog window */
 .v-card-title {
     font-weight: bold;
-    padding-bottom: 0 !important;
-    padding-top: 1rem;
+    padding: 0.7rem;
     text-align: center;
-    padding-top: 1rem;
     font-size: 1.7rem !important;
 }
 .close-btn {
@@ -69,21 +70,30 @@ body {
 }
 .line {
     height: 0;
-    width: 100%;
+    width: 80%;
     border-top: 1px solid rgb(163, 163, 163);
-    margin-top: 10px;
-    padding-bottom: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+.event-info {
+    padding: 0.7rem;
+}
+.event-info div {
+    padding: 0.5rem;
 }
 /*Table*/
 table {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     justify-content: center;
-    width: 100%;
     border: 1px solid rgb(63, 63, 63) !important;
-    border-collapse:collapse !important; 
+    border-collapse:collapse !important;
+    margin-left: auto;
+    margin-right: auto;
 }
 th, td {
     border: 1px solid rgb(63, 63, 63) !important;
-    padding: 8px !important;
+    padding: 10px !important;
     text-align: center;
 }
 .t-header {

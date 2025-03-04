@@ -242,7 +242,7 @@ import EventInfo from "../components/EventInfo.vue"
         const fetchedData = await this.getSensorData(dataType);
         if (fetchedData) {
           const value = fetchedData.data[0].mvalue;
-          const time = this.getDateFormatted(fetchedData.data[0]._timestamp)
+          const time = this.getReadableDate(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {
             this.humidity.value = value + "%";
             this.humidity.time = time;
@@ -284,6 +284,12 @@ import EventInfo from "../components/EventInfo.vue"
           content: "",
           class: "event",
           split: roomName,
+          company: event.CompanyName,
+          contactFirstName: event.ContactFirstName,
+          contactLastName: event.ContactLastName,
+          contactPhone: event.ContactPhone,
+          contactCell: event.ContactCell,
+          contactEmail: event.ContactEmail
         };
 
         const heatingEventStart = new Date(start);
@@ -304,6 +310,22 @@ import EventInfo from "../components/EventInfo.vue"
         const now = document.getElementsByClassName("vuecal__now-line")[0]
         console.log("now: ", document.getElementsByClassName("vuecal__now-line"))
         now.scrollIntoView()
+      },
+      getReadableDate(dateString) {
+        const months = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+        ];
+
+        const date = new Date(dateString);
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2);
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+  
+        return `${day} ${months[month-1]} ${year} at ${hours}:${minutes}`;
       },
     },
   }
