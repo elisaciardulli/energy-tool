@@ -39,6 +39,7 @@
               overlapsPerTimeStep
               style="height: 90vh"
               >
+              <!--Room Labels-->
               <template #split-label="{ split }">
                 <strong>{{ split.label }}</strong>
               </template>
@@ -55,44 +56,12 @@
             </vue-cal>
             <!--Dialog window-->
             <v-dialog v-model="showDialog">
-              <v-card>
-                <v-card-title>
-                  <span>{{ selectedSplit }}</span>
-                  <!--Close Button-->
-                  <span class="close-btn" icon @click="showDialog = false">
-                    <v-icon>mdi-close</v-icon>
-                  </span>
-                </v-card-title>
-                <v-card-text>
-                  <table>
-                    <tr>
-                      <td></td>
-                      <td class="t-header">Timestamp</td>
-                      <td class="t-header">Value</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Temperature</td>
-                      <td>{{ this.temperature.time }}</td>
-                      <td>{{ this.temperature.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Humidity</td>
-                      <td>{{ this.humidity.time }}</td>
-                      <td>{{ this.humidity.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Carbon dioxide</td>
-                      <td>{{ this.co2.time }}</td>
-                      <td>{{ this.co2.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Battery status</td>
-                      <td>{{ this.battery.time }}</td>
-                      <td>{{ this.battery.value }}</td>
-                    </tr>
-                  </table>
-                </v-card-text>
-              </v-card>
+              <EventInfo 
+                :event="selectedEvent" 
+                :battery="battery" 
+                :temperature="temperature"
+                :co2="co2"
+                :humidity="humidity"></EventInfo>
             </v-dialog>
           </div>
         </v-col>
@@ -101,13 +70,16 @@
 </template>
   
 <script>
+import EventInfo from "../components/EventInfo.vue"
+
   export default {
+    components: {
+      EventInfo
+    },
     data() {
       return {
         showDialog: false,
-        selectedSplit: {},
         selectedEvent: {},
-        showDialog: false,
         currDate: new Date(),
         selectedDate: new Date(),
         daySplits: [
@@ -166,7 +138,6 @@
             });
           });
           this.events = this.events.flat();
-          console.log("events: ", this.events);
         }
       },
       mapStatus(string) {
@@ -230,16 +201,9 @@
           console.error(error.message);
         }
       },
-      handleCellClick(event, e) {
-        this.selectedSplit = event.split
-        this.showDialog = true;
-        this.loadSensorData("air-temperature");
-        this.loadSensorData("air-humidity");
-        this.loadSensorData("co2");
-        this.loadSensorData("battery-state");
-      },
       onEventClick(event, e) {
-        this.selectedSplit = event.split;
+        console.log("event: ", event)
+        this.selectedEvent = event;
         this.showDialog = true;
         this.loadSensorData("air-temperature");
         this.loadSensorData("air-humidity");
@@ -259,7 +223,6 @@
         });
   
         const url = `${baseUrl}?${params.toString()}`;
-        console.log("url: ", url)
   
         try {
           const response = await fetch(url);
@@ -276,7 +239,6 @@
       async loadSensorData(dataType) {
         const fetchedData = await this.getSensorData(dataType);
         if (fetchedData) {
-          console.log("fetchedData: ", fetchedData)
           const value = fetchedData.data[0].mvalue;
           const time = this.getDateFormatted(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {

@@ -44,47 +44,6 @@
                 </v-tooltip>
               </template>
             </vue-cal>
-            <!--Dialog window-->
-            <v-dialog v-model="showDialog">
-              <v-card>
-                <v-card-title>
-                  <span>{{ selectedSplit }}</span>
-                  <!--Close Button-->
-                  <span class="close-btn" icon @click="showDialog = false">
-                    <v-icon>mdi-close</v-icon>
-                  </span>
-                </v-card-title>
-                <v-card-text>
-                  <table>
-                    <tr>
-                      <td></td>
-                      <td class="t-header">Timestamp</td>
-                      <td class="t-header">Value</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Temperature</td>
-                      <td>{{ this.temperature.time }}</td>
-                      <td>{{ this.temperature.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Humidity</td>
-                      <td>{{ this.humidity.time }}</td>
-                      <td>{{ this.humidity.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Carbon dioxide</td>
-                      <td>{{ this.co2.time }}</td>
-                      <td>{{ this.co2.value }}</td>
-                    </tr>
-                    <tr>
-                      <td class="t-header">Battery status</td>
-                      <td>{{ this.battery.time }}</td>
-                      <td>{{ this.battery.value }}</td>
-                    </tr>
-                  </table>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
           </div>
         </v-col>
       </v-row>
@@ -99,7 +58,12 @@ const route = useRoute()
 </script>
 
 <script>
+import EventInfo from "../components/EventInfo.vue"
+
   export default {
+    components: {
+      EventInfo
+    },
     data() {
       return {
         showDialog: false,

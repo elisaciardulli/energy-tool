@@ -8,7 +8,7 @@
   v-container {
     max-width:none !important;
   }
-  .vuecal__cell:hover, .day-split-header {
+  .day-split-header {
     cursor:pointer;
   }
   .day-split-header:hover {
@@ -32,6 +32,7 @@
     border-radius: 5px;
     width: 90% !important;
     left: 10% !important;
+    cursor: pointer;
   }
   .vuecal__event-time {
     display: none;
