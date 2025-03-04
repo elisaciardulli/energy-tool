@@ -9,6 +9,7 @@
             </v-card-title>
             <v-card-text>
                 <p>{{ eventStart }} - {{ eventEnd }}</p>
+                <div class="line"></div>
                 <table>
                 <tr>
                     <td></td>

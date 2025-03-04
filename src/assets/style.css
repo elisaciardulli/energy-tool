@@ -1,11 +1,22 @@
-v-container {
-    max-width:none !important;
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('/fonts/source-sans-pro/SourceSansPro-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
-.day-split-header {
-    cursor:pointer;
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
 }
+
 .day-split-header:hover {
     text-decoration:underline;
+    cursor:pointer;
+}
+/*Calendar*/
+.vuecal__title-bar {
+    background-color: black;
+    color: white;
 }
 /* Events */
 .vuecal__event-title {
@@ -18,10 +29,10 @@ v-container {
     text-overflow: ellipsis;
 }
 .event {
-    background-color: rgb(210, 210, 210);
+    background-color: rgb(225, 225, 225);
     padding: 0.5rem;
     color: rgb(57, 57, 57);
-    border-left: 4px solid rgb(100, 100, 100);
+    border-left: 4px solid rgb(142, 142, 142);
     border-radius: 5px;
     width: 90% !important;
     left: 10% !important;
@@ -49,6 +60,19 @@ v-container {
 }
 .close-btn:hover {
     cursor: pointer;
+}
+.v-card-text {
+    padding-top: 0 !important;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.line {
+    height: 0;
+    width: 100%;
+    border-top: 1px solid rgb(163, 163, 163);
+    margin-top: 10px;
+    padding-bottom: 1rem;
 }
 /*Table*/
 table {
