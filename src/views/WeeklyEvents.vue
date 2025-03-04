@@ -44,6 +44,15 @@
                 </v-tooltip>
               </template>
             </vue-cal>
+            <!--Dialog window-->
+            <EventInfo 
+              :showDialog="showDialog"
+              :event="selectedEvent" 
+              :battery="battery" 
+              :temperature="temperature"
+              :co2="co2"
+              :humidity="humidity" v-model="showDialog">
+            </EventInfo>
           </div>
         </v-col>
       </v-row>
@@ -66,8 +75,6 @@ import EventInfo from "../components/EventInfo.vue"
     },
     data() {
       return {
-        showDialog: false,
-        selectedSplit: {},
         selectedEvent: {},
         showDialog: false,
         currDate: new Date(),
@@ -194,16 +201,8 @@ import EventInfo from "../components/EventInfo.vue"
           console.error(error.message);
         }
       },
-      handleCellClick(event, e) {
-        this.selectedSplit = event.split
-        this.showDialog = true;
-        this.loadSensorData("air-temperature");
-        this.loadSensorData("air-humidity");
-        this.loadSensorData("co2");
-        this.loadSensorData("battery-state");
-      },
       onEventClick(event, e) {
-        this.selectedSplit = event.split;
+        this.selectedEvent = event;
         this.showDialog = true;
         this.loadSensorData("air-temperature");
         this.loadSensorData("air-humidity");
@@ -287,7 +286,7 @@ import EventInfo from "../components/EventInfo.vue"
           class: "heating"
         };
         return [mainEvent, heatingEvent];
-        },
+      },
   }
 }
 </script>

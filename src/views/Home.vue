@@ -55,14 +55,14 @@
               </template>
             </vue-cal>
             <!--Dialog window-->
-            <v-dialog v-model="showDialog">
-              <EventInfo 
-                :event="selectedEvent" 
-                :battery="battery" 
-                :temperature="temperature"
-                :co2="co2"
-                :humidity="humidity"></EventInfo>
-            </v-dialog>
+            <EventInfo 
+              :showDialog="showDialog"
+              :event="selectedEvent" 
+              :battery="battery" 
+              :temperature="temperature"
+              :co2="co2"
+              :humidity="humidity" v-model="showDialog">
+            </EventInfo>
           </div>
         </v-col>
       </v-row>
@@ -202,7 +202,6 @@ import EventInfo from "../components/EventInfo.vue"
         }
       },
       onEventClick(event, e) {
-        console.log("event: ", event)
         this.selectedEvent = event;
         this.showDialog = true;
         this.loadSensorData("air-temperature");
