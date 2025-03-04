@@ -102,6 +102,7 @@ import EventInfo from "../components/EventInfo.vue"
     async mounted() {
       this.loadEvents();
       this.splitHeaderClick();
+      this.scrollToCurrentTime();
     },
     methods: {
       async loadEvents() {
@@ -298,6 +299,11 @@ import EventInfo from "../components/EventInfo.vue"
           split: roomName,
         };
         return [mainEvent, heatingEvent];
+      },
+      scrollToCurrentTime() {
+        const now = document.getElementsByClassName("vuecal__now-line")[0]
+        console.log("now: ", document.getElementsByClassName("vuecal__now-line"))
+        now.scrollIntoView()
       },
     },
   }

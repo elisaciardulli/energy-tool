@@ -90,6 +90,7 @@ import EventInfo from "../components/EventInfo.vue"
     },
     async mounted() {
       this.loadRoomEvents();
+      this.scrollToCurrentTime();
     },
     methods: {
       async loadRoomEvents() {
@@ -287,6 +288,11 @@ import EventInfo from "../components/EventInfo.vue"
           class: "heating"
         };
         return [mainEvent, heatingEvent];
+      },
+      scrollToCurrentTime() {
+        const now = document.getElementsByClassName("vuecal__now-line")[0]
+        console.log("now: ", document.getElementsByClassName("vuecal__now-line"))
+        now.scrollIntoView()
       },
   }
 }
