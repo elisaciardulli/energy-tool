@@ -41,7 +41,7 @@
               >
               <!--Room Labels-->
               <template #split-label="{ split }">
-                <strong>{{ split.label }}</strong>
+                <strong><a :href="'#/' + split.label.replace(/ /g, '')">{{ split.label }}</a></strong>
               </template>
               <!-- Custom Today Button -->
               <template #today-button>
@@ -54,6 +54,7 @@
                 </v-tooltip>
               </template>
             </vue-cal>
+            <!-- <a href="#/room">Go to room</a> -->
             <!--Dialog window-->
             <EventInfo 
               :showDialog="showDialog"
@@ -271,9 +272,6 @@ import EventInfo from "../components/EventInfo.vue"
                 this.goToWeeklyEvents(room);
             });
         });
-      },
-      goToWeeklyEvents(room) {
-        this.$router.push({ path: '/weeklyEvents', query: { room } })
       },
       createEvent(start, end, event, room, roomName) {
         //create the main event

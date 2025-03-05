@@ -1,18 +1,11 @@
 <template>
     <v-container fluid>
-      <!--Room name and back arrow-->
-        <v-row cols="12" class="titleRow">
-          <v-col cols="1" md="1">
-            <div>
-                <v-icon @click="goBack">mdi-arrow-left</v-icon>
-            </div>
-          </v-col>
-          <v-col cols="11" md="11">
-            <div>
-              <h1 class="roomTitle">{{ this.$route.query.room }}</h1>
-            </div>
-          </v-col>
-        </v-row>
+      <!--Room name-->
+      <v-row class="title-row">
+        <div>
+          <h1 class="roomTitle">{{ roomName }}</h1>
+        </div>
+      </v-row>
       <v-row>
         <!-- Big Calendar -->
         <v-col class ="calendar-col" cols="12" md="12">
@@ -60,13 +53,6 @@
     </v-container>
   </template>
 
-<script setup>
-import { useRoute, useRouter } from 'vue-router'
-
-const router = useRouter()
-const route = useRoute()
-</script>
-
 <script>
 import EventInfo from "../components/EventInfo.vue"
 
@@ -76,6 +62,7 @@ import EventInfo from "../components/EventInfo.vue"
     },
     data() {
       return {
+        roomName: {},
         selectedEvent: {},
         showDialog: false,
         currDate: new Date(),
@@ -89,6 +76,7 @@ import EventInfo from "../components/EventInfo.vue"
       };
     },
     async mounted() {
+      this.roomName = (window.location.hash).replace('#/', '')
       this.loadRoomEvents();
       this.scrollToCurrentTime();
     },
@@ -113,7 +101,7 @@ import EventInfo from "../components/EventInfo.vue"
               console.log("room name: ", roomName)
 
               //filter only the correct room
-              if(roomName == this.$route.query.room) {
+              if(roomName == this.roomName) {
 
                 const eventStart = new Date(room.StartDate);
                 const eventEnd = new Date(room.EndDate);
@@ -124,7 +112,7 @@ import EventInfo from "../components/EventInfo.vue"
                     const event1 = this.createRoomEvent(eventStart, eventEnd, event, room);
                     this.events.push(event1);
                   }
-                  else if (this.$route.query.room == "Seminar 2"){
+                  else if (this.roomName == "Seminar 2"){
                     const event2 = this.createRoomEvent(eventStart, eventEnd, event, room);
                     this.events.push(event2);
                   }
@@ -244,9 +232,6 @@ import EventInfo from "../components/EventInfo.vue"
         } else {
           console.log(`No data found for ${dataType}`);
         }
-      },
-      goBack() {
-      this.$router.back();
       },
       createRoomEvent(start, end, event, room) {
         //create the main event

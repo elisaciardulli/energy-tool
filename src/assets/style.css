@@ -119,4 +119,9 @@ th, td {
 .vuecal__cell-split {
     border: 0.5px solid rgb(222, 222, 222) !important;
 }
-/**/
+/*Weekly Events Page*/
+.title-row {
+    padding: 1rem;
+    text-align: center;
+    justify-content: center;
+}
