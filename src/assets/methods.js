@@ -56,13 +56,13 @@ export default {
       console.error(error.message);
     }
   },
-  async getSensorData(dataType) {
+  async getSensorData(dataType, roomSensor) {
     const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
 
     const params = new URLSearchParams({
       limit: "1",
       offset: "0",
-      where: "sname.eq.NOI:NOI-A1-Floor1-CO2",
+      where: "sname.eq.", roomSensor,
       shownull: "false",
       distinct: "true",
       timezone: "+1",

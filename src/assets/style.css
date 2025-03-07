@@ -8,10 +8,14 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
-
+/*Split header*/
 .day-split-header:hover {
     text-decoration:underline;
     cursor:pointer;
+}
+a {
+    text-decoration: none;
+    color: black;
 }
 /*Calendar*/
 .vuecal__title-bar {
