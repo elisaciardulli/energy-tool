@@ -141,7 +141,6 @@ import methods from "../assets/methods.js"
             });
           });
           this.events = this.events.flat();
-          console.log("events: ", this.events)
         }
       },
       async onViewChange(date) {

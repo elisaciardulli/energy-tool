@@ -83,6 +83,7 @@ export default {
     }
   },
   createEvent(start, end, event, roomName) {
+    console.log("creating event")
     //create the main event
     const mainEvent = {
       start: this.getDateFormatted(start),
@@ -115,7 +116,7 @@ export default {
   },
   scrollToCurrentTime() {
     const now = document.getElementsByClassName("vuecal__now-line")[0]
-    now.scrollIntoView()
+    now.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
   },
   getReadableDate(dateString) {
     const months = [
@@ -133,5 +134,12 @@ export default {
 
     return `${day} ${months[month-1]} ${year} at ${hours}:${minutes}`;
   },
+  formatRoomName(roomName) {
+    // check if the last character is a number (Seminar1 should become Seminar 1)
+    if(!isNaN(roomName[roomName.length-1])) {
+      roomName = roomName.slice(0, roomName.length - 1) + " " + roomName[roomName.length - 1];
+    }
+    return roomName
+  }
 };
    

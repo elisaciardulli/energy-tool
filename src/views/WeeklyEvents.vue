@@ -78,6 +78,7 @@ import methods from "../assets/methods.js"
     },
     async mounted() {
       this.roomName = (window.location.hash).replace('#/', '')
+      this.roomName = methods.formatRoomName(this.roomName)
       this.loadRoomEvents();
       methods.scrollToCurrentTime();
     },
@@ -96,7 +97,9 @@ import methods from "../assets/methods.js"
         if (fetchedEvents && fetchedEvents.Items) {
           fetchedEvents.Items.forEach(event => {
             event.RoomBooked.forEach(room => {
-              const roomName = room.SpaceDescRoomMapping;
+              const roomName = room.SpaceDescRoomMapping
+              console.log("roomName: ", roomName)
+              console.log("this roomName: ", this.roomName)
 
               //filter only the correct room
               if(roomName == this.roomName) {
@@ -115,7 +118,8 @@ import methods from "../assets/methods.js"
                     this.events.push(event2);
                   }
                 } else {
-                  const mainEvent = this.createEvent(eventStart, eventEnd, event, roomName)
+                  const mainEvent = methods.createEvent(eventStart, eventEnd, event, roomName)
+                  console.log("main event, ", mainEvent)
                   this.events.push(mainEvent);
                 };
               };
