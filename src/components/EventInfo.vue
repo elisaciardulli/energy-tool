@@ -77,17 +77,13 @@ export default {
     }
   },
   watch: {
-    // Watch for changes to event prop and reformat the dates when the event changes
     'event.start': 'formatEventStart',
     'event.end': 'formatEventEnd',
   },
   methods: {
-    // Emit an event to update showDialog in the parent
     updateShowDialog(value) {
       this.$emit('update:showDialog', value);
     },
-
-    // Close the dialog and notify the parent
     closeDialog() {
       this.$emit('update:showDialog', false);
     },

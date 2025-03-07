@@ -74,6 +74,7 @@
 <script>
 import EventInfo from "../components/EventInfo.vue"
 import methods from "../assets/methods.js"
+import parameters from "../assets/parameters.json"
 
   export default {
     components: {
@@ -148,17 +149,17 @@ import methods from "../assets/methods.js"
         this.loadEvents();
       },
       onEventClick(event, e) {
-        console.log("event: ", event)
         this.selectedEvent = event;
         this.showDialog = true;
-        this.loadSensorData("air-temperature");
-        this.loadSensorData("air-humidity");
-        this.loadSensorData("co2");
-        this.loadSensorData("battery-state");
+        this.loadSensorData("air-temperature", parameters["Seminar 1"]);
+        this.loadSensorData("air-humidity", parameters["Seminar 1"]);
+        this.loadSensorData("co2", parameters["Seminar 1"]);
+        this.loadSensorData("battery-state", parameters["Seminar 1"]);
       },
-      async loadSensorData(dataType) {
-        const fetchedData = await this.getSensorData(dataType);
+      async loadSensorData(dataType, sensorName) {
+        const fetchedData = await methods.getSensorData(dataType, sensorName);
         if (fetchedData) {
+          console.log("fetched Data: ", fetchedData)
           const value = fetchedData.data[0].mvalue;
           const time = methods.getReadableDate(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {

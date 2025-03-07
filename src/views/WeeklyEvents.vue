@@ -143,32 +143,6 @@ import methods from "../assets/methods.js"
         this.loadSensorData("co2");
         this.loadSensorData("battery-state");
       },
-      async loadRoomSensorData(dataType) {
-        const fetchedData = await this.getSensorData(dataType);
-        if (fetchedData) {
-          console.log("fetchedData: ", fetchedData)
-          const value = fetchedData.data[0].mvalue;
-          const time = methods.getDateFormatted(fetchedData.data[0]._timestamp)
-          if(dataType == "air-humidity") {
-            this.humidity.value = value + "%";
-            this.humidity.time = time;
-          }
-          else if(dataType == "air-temperature") {
-            this.temperature.value = value + "°C";
-            this.temperature.time = time
-          }
-          else if(dataType == "co2") {
-            this.co2.value = value + "ppm";
-            this.co2.time = time
-          }
-          else if(dataType == "battery-state") {
-            this.battery.value = value + "%";
-            this.battery.time = time;
-          }
-        } else {
-          console.log(`No data found for ${dataType}`);
-        }
-      },
   }
 }
 </script>

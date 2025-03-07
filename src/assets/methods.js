@@ -56,19 +56,21 @@ export default {
       console.error(error.message);
     }
   },
-  async getSensorData(dataType, roomSensor) {
+  async getSensorData(dataType, sensorName) {
+    console.log("SENSOR NAME: ", sensorName);
     const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
 
     const params = new URLSearchParams({
       limit: "1",
       offset: "0",
-      where: "sname.eq.", roomSensor,
+      where: `sname.eq.${sensorName}`,
       shownull: "false",
       distinct: "true",
       timezone: "+1",
     });
 
     const url = `${baseUrl}?${params.toString()}`;
+    console.log("url: ", url)
 
     try {
       const response = await fetch(url);
