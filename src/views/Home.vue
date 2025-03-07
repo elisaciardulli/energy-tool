@@ -73,6 +73,7 @@
   
 <script>
 import EventInfo from "../components/EventInfo.vue"
+import methods from "../assets/methods.js"
 
   export default {
     components: {
@@ -102,8 +103,7 @@ import EventInfo from "../components/EventInfo.vue"
     },
     async mounted() {
       this.loadEvents();
-      this.splitHeaderClick();
-      this.scrollToCurrentTime();
+      methods.scrollToCurrentTime();
     },
     methods: {
       async loadEvents() {
@@ -116,7 +116,7 @@ import EventInfo from "../components/EventInfo.vue"
         const endDate = new Date(this.selectedDate);
         endDate.setHours(23, 59, 59, 999);
 
-        const fetchedEvents = await this.getData(startDate, endDate);
+        const fetchedEvents = await methods.getData(startDate, endDate);
 
         if (fetchedEvents && fetchedEvents.Items) {
           const eventsForCalendar = fetchedEvents.Items.forEach(event => {
@@ -128,81 +128,25 @@ import EventInfo from "../components/EventInfo.vue"
 
               // Check special case Seminar 1+2
               if (room.SpaceDescRoomMapping == "Seminar 1+2") {
-                const event1 = this.createEvent(eventStart, eventEnd, event, room, "Seminar 1");
+                const event1 = methods.createEvent(eventStart, eventEnd, event, "Seminar 1");
                 this.events.push(event1);
-                const event2 = this.createEvent(eventStart, eventEnd, event, room, "Seminar 2");
+                const event2 = methods.createEvent(eventStart, eventEnd, event, "Seminar 2");
                 this.events.push(event2);
               } else {
-                const roomName = this.mapStatus(room.SpaceDesc);
+                const roomName = methods.mapStatus(room.SpaceDesc);
                 // Create the main event
-                const mainEvent = this.createEvent(eventStart, eventEnd, event, room, roomName);
+                const mainEvent = methods.createEvent(eventStart, eventEnd, event, roomName);
                 this.events.push(mainEvent)
               }
             });
           });
           this.events = this.events.flat();
+          console.log("events: ", this.events)
         }
-      },
-      mapStatus(string) {
-        const roomList = [
-          "Seminar 1",
-          "Seminar 2",
-          "Seminar 3",
-          "Seminar 4",
-          "Seminar Area",
-          "Foyer",
-          "Crane Hall",
-        ];
-        for (let i = 0; i < roomList.length; i++) {
-          let roomRegex = new RegExp(".*" + roomList[i] + ".*", "i");
-          if (roomRegex.test(string)) {
-            return roomList[i];
-          }
-        }
-        return "NO MATCH";
-      },
-      getDateFormatted(dateString) {
-        const date = new Date(dateString);
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-  
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
       },
       async onViewChange(date) {
         this.selectedDate = date.startDate;
         this.loadEvents();
-      },
-      async getData(startDate, endDate) {
-        const baseUrl = "https://tourism.api.opendatahub.com/v1/EventShort";
-  
-        const params = new URLSearchParams({
-          pagenumber: "1",
-          startdate: this.getDateFormatted(startDate),
-          enddate: this.getDateFormatted(endDate),
-          eventlocation: "NOI",
-          active: "true",
-          sortorder: "ASC",
-          optimizedates: "true",
-          removenullvalues: "true",
-        });
-  
-        const url = `${baseUrl}?${params.toString()}`;
-  
-        try {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-          }
-  
-          const json = await response.json();
-          return json; // Return the data
-        } catch (error) {
-          console.error(error.message);
-        }
       },
       onEventClick(event, e) {
         console.log("event: ", event)
@@ -213,37 +157,11 @@ import EventInfo from "../components/EventInfo.vue"
         this.loadSensorData("co2");
         this.loadSensorData("battery-state");
       },
-      async getSensorData(dataType) {
-        const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
-  
-        const params = new URLSearchParams({
-          limit: "1",
-          offset: "0",
-          where: "sname.eq.NOI:NOI-A1-Floor1-CO2",
-          shownull: "false",
-          distinct: "true",
-          timezone: "+1",
-        });
-  
-        const url = `${baseUrl}?${params.toString()}`;
-  
-        try {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-          }
-  
-          const json = await response.json();
-          return json; // Return the data
-        } catch (error) {
-          console.error(error.message);
-        }
-      },
       async loadSensorData(dataType) {
         const fetchedData = await this.getSensorData(dataType);
         if (fetchedData) {
           const value = fetchedData.data[0].mvalue;
-          const time = this.getReadableDate(fetchedData.data[0]._timestamp)
+          const time = methods.getReadableDate(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {
             this.humidity.value = value + "%";
             this.humidity.time = time;
@@ -263,67 +181,6 @@ import EventInfo from "../components/EventInfo.vue"
         } else {
           console.log(`No data found for ${dataType}`);
         }
-      },
-      splitHeaderClick() {
-        const headers = document.querySelectorAll('.day-split-header');
-        headers.forEach(header => {
-            header.addEventListener('click', () => {
-                const room = header.innerText;
-                this.goToWeeklyEvents(room);
-            });
-        });
-      },
-      createEvent(start, end, event, room, roomName) {
-        //create the main event
-        const mainEvent = {
-          start: this.getDateFormatted(start),
-          end: this.getDateFormatted(end),
-          title: event.EventTitle.it,
-          content: "",
-          class: "event",
-          split: roomName,
-          company: event.CompanyName,
-          contactFirstName: event.ContactFirstName,
-          contactLastName: event.ContactLastName,
-          contactPhone: event.ContactPhone,
-          contactCell: event.ContactCell,
-          contactEmail: event.ContactEmail
-        };
-
-        const heatingEventStart = new Date(start);
-        heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 60);
-
-        // create the corresponding heating event
-        const heatingEvent = {
-          start: this.getDateFormatted(heatingEventStart),
-          end: this.getDateFormatted(end),
-          title:"",
-          content: "",
-          class: "heating",
-          split: roomName,
-        };
-        return [mainEvent, heatingEvent];
-      },
-      scrollToCurrentTime() {
-        const now = document.getElementsByClassName("vuecal__now-line")[0]
-        console.log("now: ", document.getElementsByClassName("vuecal__now-line"))
-        now.scrollIntoView()
-      },
-      getReadableDate(dateString) {
-        const months = [
-        "January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"
-        ];
-
-        const date = new Date(dateString);
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2);
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-  
-        return `${day} ${months[month-1]} ${year} at ${hours}:${minutes}`;
       },
     },
   }
