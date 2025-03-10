@@ -1,8 +1,8 @@
 <template>
     <v-container fluid>
-      <v-row>
+      <v-row height="100%">
         <!-- Small Calendar - Date Picker -->
-        <v-col cols="12" md="3">
+        <v-col md="3" class="d-flex align-center full-height-col">
           <div class="small-cal-container">
             <vue-cal
               class="vuecal--date-picker"
@@ -13,8 +13,11 @@
               :disable-views="['years', 'year', 'week', 'day']"
               @cell-focus="selectedDate = $event"
               today-button
-              style="width: 100%; height: auto;">
+              style="width: 100%; height: 100%;">
             </vue-cal>
+            <div>
+              <img src="../assets/img/NOI_2_BK.jpg" width="100%">
+            </div>
           </div>
         </v-col>
   

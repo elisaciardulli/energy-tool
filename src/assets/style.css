@@ -8,6 +8,23 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
+.vuecal, .vuecal__title-bar, .vuecal__header {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+.vuecal {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+.vuecal__split-days-headers .day-split-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    flex-grow: 0 !important;
+    flex-basis: auto !important;
+}
 /*Split header*/
 .day-split-header:hover {
     text-decoration:underline;
@@ -56,6 +73,7 @@ a {
     font-weight: bold;
     text-align: center;
     font-size: 1.7rem !important;
+    text-overflow: ellipsis;
 }
 .close-btn {
     position: absolute; 
