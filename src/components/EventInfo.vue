@@ -20,39 +20,33 @@
                 <div class="contact-info" v-if="this.event.contactName || this.event.contactPhone || this.event.contactCell || this.event.contactEmail">
                   <p><strong>Contact:</strong></p>
                   <p v-if="this.event.contactFirstName || this.event.contactLastName">{{ this.event.contactFirstName}} {{ this.event.contactLastName}}</p>
-                  <p v-if="this.event.contactPhone"><strong>Phone number:</strong> {{ this.event.contactPhone }}</p>
+                  <p v-if="this.event.contactPhone"><strong>Phone number:</strong>>{{ this.event.contactPhone }}</p>
                   <p v-if="this.event.contactCell"><strong>Cell number:</strong> {{ this.event.contactCell }}</p>
                   <p v-if="this.event.contactEmail"><strong>E-Mail:</strong> {{ this.event.contactEmail }}</p>
                 </div>
               </div>
               <div class="line"></div>
-              <table>
-                <tr>
-                    <td></td>
-                    <td class="t-header">Timestamp</td>
-                    <td class="t-header">Value</td>
-                </tr>
-                <tr>
-                    <td class="t-header">Temperature</td>
-                    <td>{{ temperature.time }}</td>
-                    <td>{{ temperature.value }}</td>
-                </tr>
-                <tr>
-                    <td class="t-header">Humidity</td>
-                    <td>{{ humidity.time }}</td>
-                    <td>{{ humidity.value }}</td>
-                </tr>
-                <tr>
-                    <td class="t-header">Carbon dioxide</td>
-                    <td>{{ co2.time }}</td>
-                    <td>{{ co2.value }}</td>
-                </tr>
-                <tr>
-                    <td class="t-header">Battery status</td>
-                    <td>{{ battery.time }}</td>
-                    <td>{{ battery.value }}</td>
-                </tr>
-              </table>
+              <div class="sensor-info">
+                <table>
+                  <tr>
+                      <td class="t-header top">Temperature</td>
+                      <td>{{ temperature.value }}</td>
+                  </tr>
+                  <tr>
+                      <td class="t-header">Humidity</td>
+                      <td>{{ humidity.value }}</td>
+                  </tr>
+                  <tr>
+                      <td class="t-header">Carbon dioxide</td>
+                      <td>{{ co2.value }}</td>
+                  </tr>
+                  <tr>
+                      <td class="t-header bottom">Battery status</td>
+                      <td>{{ battery.value }}</td>
+                  </tr>
+                </table>
+                <p class="small-info">Last updated: {{ battery.time }}</p>
+              </div>
             </v-card-text>
         </v-card>
     </v-dialog>
