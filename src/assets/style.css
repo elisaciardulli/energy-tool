@@ -54,12 +54,18 @@ a {
 .vuecal__header {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
+/*Today button*/
+.v-btn {
+    background-color: black !important;
+    color: white;
+}
 /* Events */
 .vuecal__event-title {
     font-size: 1rem;
     font-weight: 100;
     overflow: hidden;
     display: -webkit-box;
+    line-clamp: 1;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
@@ -74,6 +80,9 @@ a {
     left: 10% !important;
     cursor: pointer;
 }
+/* .event:hover {
+    box-shadow: 0 0px 15px rgba(0, 0, 0, 0.2);
+} */
 .vuecal__event-time {
     display: none;
 }

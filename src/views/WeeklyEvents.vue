@@ -30,7 +30,7 @@
               <template #today-button>
                 <v-tooltip>
                   <template #activator="{ on }">
-                    <v-btn v-on="on">
+                    <v-btn v-on="on" class="custom-today">
                       <span>Today</span>
                     </v-btn>
                   </template>
