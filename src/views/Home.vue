@@ -58,11 +58,8 @@
             <!--Dialog window-->
             <EventInfo 
               :showDialog="showDialog"
-              :event="selectedEvent" 
-              :battery="battery" 
-              :temperature="temperature"
-              :co2="co2"
-              :humidity="humidity" v-model="showDialog"
+              :event="selectedEvent"  
+              v-model="showDialog"
               @update:showDialog="showDialog = $event">
             </EventInfo>
           </div>
@@ -74,7 +71,6 @@
 <script>
 import EventInfo from "../components/EventInfo.vue"
 import methods from "../assets/methods.js"
-import parameters from "../assets/parameters.json"
 
   export default {
     components: {
@@ -96,10 +92,6 @@ import parameters from "../assets/parameters.json"
         ],
         events: [],
         heating: [],
-        temperature: {time: "", value: ""},
-        humidity: {time: "", value: ""},
-        co2: {time: "", value: ""},
-        battery: {time: "", value: ""},
       };
     },
     async mounted() {
@@ -151,36 +143,6 @@ import parameters from "../assets/parameters.json"
       onEventClick(event, e) {
         this.selectedEvent = event;
         this.showDialog = true;
-        this.loadSensorData("air-temperature", parameters["Seminar 1"]);
-        this.loadSensorData("air-humidity", parameters["Seminar 1"]);
-        this.loadSensorData("co2", parameters["Seminar 1"]);
-        this.loadSensorData("battery-state", parameters["Seminar 1"]);
-      },
-      async loadSensorData(dataType, sensorName) {
-        const fetchedData = await methods.getSensorData(dataType, sensorName);
-        if (fetchedData) {
-          console.log("fetched Data: ", fetchedData)
-          const value = fetchedData.data[0].mvalue;
-          const time = methods.getReadableDate(fetchedData.data[0]._timestamp)
-          if(dataType == "air-humidity") {
-            this.humidity.value = value + "%";
-            this.humidity.time = time;
-          }
-          else if(dataType == "air-temperature") {
-            this.temperature.value = value + "°C";
-            this.temperature.time = time
-          }
-          else if(dataType == "co2") {
-            this.co2.value = value + "ppm";
-            this.co2.time = time
-          }
-          else if(dataType == "battery-state") {
-            this.battery.value = value + "%";
-            this.battery.time = time;
-          }
-        } else {
-          console.log(`No data found for ${dataType}`);
-        }
       },
     },
   }

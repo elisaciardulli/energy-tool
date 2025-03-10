@@ -57,7 +57,6 @@ export default {
     }
   },
   async getSensorData(dataType, sensorName) {
-    console.log("SENSOR NAME: ", sensorName);
     const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
 
     const params = new URLSearchParams({
@@ -70,7 +69,6 @@ export default {
     });
 
     const url = `${baseUrl}?${params.toString()}`;
-    console.log("url: ", url)
 
     try {
       const response = await fetch(url);
@@ -85,7 +83,6 @@ export default {
     }
   },
   createEvent(start, end, event, roomName) {
-    console.log("creating event")
     //create the main event
     const mainEvent = {
       start: this.getDateFormatted(start),

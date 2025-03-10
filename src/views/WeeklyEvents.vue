@@ -40,11 +40,8 @@
             <!--Dialog window-->
             <EventInfo 
               :showDialog="showDialog"
-              :event="selectedEvent" 
-              :battery="battery" 
-              :temperature="temperature"
-              :co2="co2"
-              :humidity="humidity" v-model="showDialog"
+              :event="selectedEvent"  
+              v-model="showDialog"
               @update:showDialog="showDialog = $event">
             </EventInfo>
           </div>
@@ -98,8 +95,6 @@ import methods from "../assets/methods.js"
           fetchedEvents.Items.forEach(event => {
             event.RoomBooked.forEach(room => {
               const roomName = room.SpaceDescRoomMapping
-              console.log("roomName: ", roomName)
-              console.log("this roomName: ", this.roomName)
 
               //filter only the correct room
               if(roomName == this.roomName) {
@@ -119,7 +114,6 @@ import methods from "../assets/methods.js"
                   }
                 } else {
                   const mainEvent = methods.createEvent(eventStart, eventEnd, event, roomName)
-                  console.log("main event, ", mainEvent)
                   this.events.push(mainEvent);
                 };
               };
@@ -127,7 +121,6 @@ import methods from "../assets/methods.js"
           });
         }
         this.events = this.events.flat();
-        console.log("events: ", this.events)
       },
       async onViewChange(date) {
         // Get the start and end of the currently selected date
@@ -138,10 +131,6 @@ import methods from "../assets/methods.js"
       onEventClick(event, e) {
         this.selectedEvent = event;
         this.showDialog = true;
-        this.loadSensorData("air-temperature");
-        this.loadSensorData("air-humidity");
-        this.loadSensorData("co2");
-        this.loadSensorData("battery-state");
       },
   }
 }
