@@ -65,10 +65,10 @@ a {
     text-overflow: ellipsis;
 }
 .event {
-    background-color: rgb(225, 225, 225);
+    background-color: rgb(236, 236, 236);
     padding: 0.5rem;
-    color: rgb(57, 57, 57);
-    border-left: 4px solid rgb(142, 142, 142);
+    color: black;
+    border-left: 4px solid black;
     border-radius: 5px;
     width: 90% !important;
     left: 10% !important;
@@ -152,7 +152,7 @@ th, td {
 }
 /* Style heating events */
 .heating {
-    background-color:  rgb(230, 100, 100);
+    background-color:  rgb(178, 34, 34);
     color: rgb(57, 57, 57);
     border-radius: 4px;
     width: 10% !important;
