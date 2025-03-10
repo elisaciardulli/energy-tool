@@ -8,6 +8,7 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
+/*Calendar*/
 .vuecal, .vuecal__title-bar, .vuecal__header {
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -26,14 +27,25 @@ body {
     flex-basis: auto !important;
 }
 /*Split header*/
-.day-split-header:hover {
-    text-decoration:underline;
-    cursor:pointer;
-}
 a {
     text-decoration: none;
+    position: relative;
     color: black;
-}
+  } 
+  a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0.5px;
+    transform: translateX(-50%);
+    background-color: black;
+    transition: width 0.5s ease-in-out;
+  }  
+  a:hover::after {
+    width: 100%;
+  }
 /*Calendar*/
 .vuecal__title-bar {
     background-color: black;
