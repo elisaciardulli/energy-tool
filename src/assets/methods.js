@@ -69,6 +69,7 @@ export default {
     });
 
     const url = `${baseUrl}?${params.toString()}`;
+    console.log("url: ", url)
 
     try {
       const response = await fetch(url);

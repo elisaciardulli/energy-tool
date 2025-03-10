@@ -80,15 +80,6 @@ export default {
     'event.start': 'formatEventStart',
     'event.end': 'formatEventEnd',
   },
-  mounted() {
-    console.log("event: ", this.event)
-    console.log("event contact: ", this.event.contactFirstName)
-    console.log("showdialog: ", this.showDialog)
-    this.loadSensorData("air-humidity", parameters[`${this.event.split}`]);
-    this.loadSensorData("air-temperature", parameters[`${this.event.split}`]);
-    this.loadSensorData("co2" , parameters[`${this.event.split}`]);
-    this.loadSensorData("battery-state", parameters[`${this.event.split}`]);
-  },
   methods: {
     updateShowDialog(value) {
       this.$emit('update:showDialog', value);
@@ -109,7 +100,8 @@ export default {
     },
     async loadSensorData(dataType, roomName) {
         const fetchedData = await methods.getSensorData(dataType, roomName);
-        if (fetchedData.length > 0) {
+        if (fetchedData) {
+          console.log("fetched data:", fetchedData)
           const value = fetchedData.data[0].mvalue;
           const time = methods.getReadableDate(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {
@@ -131,6 +123,11 @@ export default {
     },
     updateRoom() {
       this.eventRoom = this.event.split;
+      console.log("eventroom: ", this.eventRoom)
+      this.loadSensorData("air-humidity", parameters[`${this.eventRoom}`]);
+      this.loadSensorData("air-temperature", parameters[`${this.eventRoom}`]);
+      this.loadSensorData("co2" , parameters[`${this.eventRoom}`]);
+      this.loadSensorData("battery-state", parameters[`${this.eventRoom}`]);
     }
   },
 };
