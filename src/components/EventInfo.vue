@@ -45,7 +45,7 @@
                       <td>{{ battery }}</td>
                   </tr>
                 </table>
-                <p class="small-info">Last updated: {{ battery }}</p>
+                <p class="small-info">Last updated: {{ timestamp }}</p>
               </div>
             </v-card-text>
         </v-card>
@@ -103,18 +103,20 @@ export default {
         if (fetchedData) {
           console.log("fetched data:", fetchedData)
           const value = fetchedData.data[0].mvalue;
+          const unit = fetchedData.data[0].tunit;
+          const dataString = value + " " + unit;
           const time = methods.getReadableDate(fetchedData.data[0]._timestamp)
           if(dataType == "air-humidity") {
-            this.humidity = value + " %";
+            this.humidity = dataString;
           }
           else if(dataType == "air-temperature") {
-            this.temperature = value + " °C";
+            this.temperature = dataString;
           }
           else if(dataType == "co2") {
-            this.co2 = value + " ppm";
+            this.co2 = dataString;
           }
           else if(dataType == "battery-state") {
-            this.battery = value + " %";
+            this.battery = dataString;
           }
           this.timestamp = time;
         } else {
