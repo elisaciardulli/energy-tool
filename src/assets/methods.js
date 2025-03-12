@@ -69,7 +69,6 @@ export default {
     });
 
     const url = `${baseUrl}?${params.toString()}`;
-    console.log("url: ", url)
 
     try {
       const response = await fetch(url);
@@ -84,7 +83,6 @@ export default {
     }
   },
   createEvent(start, end, event, roomName) {
-    //create the main event
     const mainEvent = {
       start: this.getDateFormatted(start),
       end: this.getDateFormatted(end),
@@ -98,21 +96,8 @@ export default {
       contactPhone: event.ContactPhone,
       contactCell: event.ContactCell,
       contactEmail: event.ContactEmail
-    };
-
-    const heatingEventStart = new Date(start);
-    heatingEventStart.setMinutes(heatingEventStart.getMinutes() - 60);
-
-    // create the corresponding heating event
-    const heatingEvent = {
-      start: this.getDateFormatted(heatingEventStart),
-      end: this.getDateFormatted(end),
-      title:"",
-      content: "",
-      class: "heating",
-      split: roomName,
-    };
-    return [mainEvent, heatingEvent];
+    }
+    return mainEvent;
   },
   scrollToCurrentTime() {
     const now = document.getElementsByClassName("vuecal__now-line")[0]
@@ -140,6 +125,24 @@ export default {
       roomName = roomName.slice(0, roomName.length - 1) + " " + roomName[roomName.length - 1];
     }
     return roomName
+  },
+  sortEventsByRoom(events) {
+    let eventsByRoom = {
+      Seminar1: [],
+      Seminar2: [],
+      Seminar3: [],
+      Seminar4: [],
+      Foyer: [],
+      CraneHall: [],
+    }
+    for(let i = 0; i < events.length; i++) {
+      let currEvent = events[i]
+      let eventRoom = currEvent.split.replace(/\s+/g, '');
+      if(eventsByRoom[eventRoom]) {
+        eventsByRoom[eventRoom].push(currEvent)
+      }
+    }
+    return eventsByRoom;
   }
 };
    

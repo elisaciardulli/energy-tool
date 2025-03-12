@@ -101,7 +101,6 @@ export default {
     async loadSensorData(dataType, roomName) {
         const fetchedData = await methods.getSensorData(dataType, roomName);
         if (fetchedData) {
-          console.log("fetched data:", fetchedData)
           const value = fetchedData.data[0].mvalue;
           const unit = fetchedData.data[0].tunit;
           const dataString = value + " " + unit;

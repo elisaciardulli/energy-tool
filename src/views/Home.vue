@@ -74,6 +74,7 @@
 <script>
 import EventInfo from "../components/EventInfo.vue"
 import methods from "../assets/methods.js"
+import parameters from "../assets/parameters.json"
 
   export default {
     components: {
@@ -136,7 +137,9 @@ import methods from "../assets/methods.js"
               }
             });
           });
-          this.events = this.events.flat();
+          const heatingEvents = this.createHeatingEvents();
+          this.events.push(...heatingEvents)
+
         }
       },
       async onViewChange(date) {
@@ -147,6 +150,68 @@ import methods from "../assets/methods.js"
         this.selectedEvent = event;
         this.showDialog = true;
       },
-    },
+      createHeatingEvents() {
+        let heatingEvents = [];
+
+        // Sort events into individual rooms {room: "Seminar1", events: [...]}, sorted by start time
+        const eventsByRoom = methods.sortEventsByRoom(this.events);
+
+        // Check all rooms
+        for (let roomName in eventsByRoom) {
+          let events = eventsByRoom[roomName];
+
+          if(events.length > 0) {
+            let index = 0;
+            // Check the time difference between each event in the room
+            while (index < events.length) {
+              let currEvent = events[index];
+              let nextEvent = events[index + 1];
+              let heating;
+
+              //the heating for the event starts 1 hour before the event
+              let heatingStart = new Date(currEvent.start)
+              heatingStart.setMinutes(heatingStart.getMinutes() - 60);
+
+              //handle last event of the day
+              if(!nextEvent) {
+                heating = {
+                  start: methods.getDateFormatted(heatingStart),
+                  end: currEvent.end,
+                  class: 'heating',
+                  split: methods.formatRoomName(roomName),
+                };
+              //handle events starting from first until penultimate
+              } else {
+                // Calculate time difference between the events
+                let timeDiff = new Date(nextEvent.start) - new Date(currEvent.end);
+                timeDiff = timeDiff / (1000 * 60)
+
+                // If the time difference is too small, the events share a heating event
+                if (timeDiff <= parameters["MinuteDiff"]) {
+                  heating = {
+                    start: methods.getDateFormatted(heatingStart),
+                    end: nextEvent.end,
+                    class: 'heating',
+                    split: methods.formatRoomName(roomName),
+                  };
+                }
+                // if there is enough time between the events, the event has its won heating
+                else {
+                  heating = {
+                    start: methods.getDateFormatted(heatingStart),
+                    end: currEvent.end,
+                    class: 'heating',
+                    split: methods.formatRoomName(roomName),
+                  };
+                }
+              }
+              heatingEvents.push(heating);
+              index += 1;
+            }
+          }
+        }
+        return heatingEvents;
+      }
+    }
   }
 </script>
