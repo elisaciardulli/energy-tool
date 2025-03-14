@@ -101,6 +101,7 @@ export default {
     async loadSensorData(dataType, roomName) {
         const fetchedData = await methods.getSensorData(dataType, roomName);
         if (fetchedData) {
+          console.log(`fetched data for ${dataType}: `, fetchedData)
           const value = fetchedData.data[0].mvalue;
           const unit = fetchedData.data[0].tunit;
           const dataString = value + " " + unit;
@@ -111,10 +112,10 @@ export default {
           else if(dataType == "air-temperature") {
             this.temperature = dataString;
           }
-          else if(dataType == "co2") {
+          else if(dataType == "co2-ppm") {
             this.co2 = dataString;
           }
-          else if(dataType == "battery-state") {
+          else if(dataType == "battery-state-percent") {
             this.battery = dataString;
           }
           this.timestamp = time;
@@ -127,8 +128,8 @@ export default {
       console.log("eventroom: ", this.eventRoom)
       this.loadSensorData("air-humidity", parameters[`${this.eventRoom}`]);
       this.loadSensorData("air-temperature", parameters[`${this.eventRoom}`]);
-      this.loadSensorData("co2" , parameters[`${this.eventRoom}`]);
-      this.loadSensorData("battery-state", parameters[`${this.eventRoom}`]);
+      this.loadSensorData("co2-ppm" , parameters[`${this.eventRoom}`]);
+      this.loadSensorData("battery-state-percent", parameters[`${this.eventRoom}`]);
     }
   },
 };

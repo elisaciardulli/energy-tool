@@ -185,3 +185,6 @@ th, td {
     text-align: center;
     justify-content: center;
 }
+.vuecal .clickable {
+    cursor: default !important;
+  }

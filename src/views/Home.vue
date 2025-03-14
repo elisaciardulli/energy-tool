@@ -95,7 +95,6 @@ import parameters from "../assets/parameters.json"
           {id:"Crane Hall", label: 'Crane Hall'}
         ],
         events: [],
-        heating: [],
       };
     },
     async mounted() {

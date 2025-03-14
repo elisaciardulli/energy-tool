@@ -20,6 +20,7 @@
               :selected-date="selectedDate"
               :events="events"
               @view-change="onViewChange"
+              @ready="onReady"
               watchRealTime
               @cell-click="handleCellClick"
               :on-event-click="onEventClick"
@@ -66,11 +67,6 @@ import methods from "../assets/methods.js"
         currDate: new Date(),
         selectedDate: new Date(),
         events: [],
-        heating: [],
-        temperature: {time: "", value: ""},
-        humidity: {time: "", value: ""},
-        co2: {time: "", value: ""},
-        battery: {time: "", value: ""},
       };
     },
     async mounted() {
@@ -83,20 +79,14 @@ import methods from "../assets/methods.js"
       async loadRoomEvents() {
         // Make sure the events list is empty
         this.events = [];
-
-        // Get the start and end date of the current week
-        const startDate = new Date(this.selectedDate);
-        startDate.setHours(0,0,0,0);
-        const endDate = new Date(startDate).addDays(6);
-        endDate.setHours(23,59, 59, 999);
   
-        const fetchedEvents = await methods.getData(startDate, endDate);
+        const fetchedEvents = await methods.getData(this.startDate, this.endDate);
         if (fetchedEvents && fetchedEvents.Items) {
           fetchedEvents.Items.forEach(event => {
             event.RoomBooked.forEach(room => {
               const roomName = room.SpaceDescRoomMapping
 
-              //filter only the correct room
+              //filter only the events for the current room
               if(roomName == this.roomName) {
 
                 const eventStart = new Date(room.StartDate);
@@ -122,9 +112,21 @@ import methods from "../assets/methods.js"
         }
         this.events = this.events.flat();
       },
-      async onViewChange(date) {
+      async onReady(data) {
+        //set the start and end date of the current week
+        this.startDate = data.startDate;
+        this.endDate = data.endDate;
+        console.log("startDate: ", this.startDate)
+        console.log("endDate: ", this.endDate)
+      },
+      async onViewChange(data) {
+        //set the start and end date of the current week
+        console.log("startDate: ", this.startDate)
+        console.log("endDate: ", this.endDate)
+        this.startDate = data.startDate;
+        this.endDate = data.endDate;
         // Get the start and end of the currently selected date
-        this.selectedDate = date.startDate;
+        this.selectedDate = data.startDate;
         //Get the right events for this week
         this.loadRoomEvents();
       },
@@ -132,6 +134,10 @@ import methods from "../assets/methods.js"
         this.selectedEvent = event;
         this.showDialog = true;
       },
+      createRoomHeatingEvents() {
+        const eventsByDay = methods.sortEventsByDay()
+        
+      }
   }
 }
 </script>

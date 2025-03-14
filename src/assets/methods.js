@@ -57,7 +57,7 @@ export default {
     }
   },
   async getSensorData(dataType, sensorName) {
-    const baseUrl = `https://mobility.api.opendatahub.com/v2/flat/IndoorStation/${dataType}/latest`;
+    const baseUrl = `https://mobility.api.opendatahub.testingmachine.eu/v2/flat%2Cnode/IndoorStation/${dataType}/latest`;
 
     const params = new URLSearchParams({
       limit: "1",
@@ -143,6 +143,21 @@ export default {
       }
     }
     return eventsByRoom;
+  },
+  sortEventsByDay(events) {
+    let eventsByRoom = {
+      0: [],
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+    }
+    //sort the events into their days
+    for(let i = 0; i < events.length) {
+      
+    }
   }
 };
    
